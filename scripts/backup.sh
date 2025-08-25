@@ -43,7 +43,7 @@ backup_mysql(){
 upload_scp(){
     local file=$1
     echo "SCP 업로드: $file >>>>>>> $SCP_USER@SCP_HOST:$SCP_DIR" | tee -a $LOG_FILE >&2
-    scp "$file"  "$SCP_USER@SCP_HOST:$SCP_DIR"
+    scp -P $SCP_PORT "$file"  "$SCP_USER@SCP_HOST:$SCP_DIR"
     echo 
 }
 
@@ -51,7 +51,7 @@ upload_scp(){
 verify_checksum(){
     local file=$1
     local local_checksum=$(sha256sum "$file" | awk '{print $1}')
-    local remote_checksum=$(ssh "$SCP_USER@$SCP_HOST" "sha256sum '${SCP_DIR}/$(basename "$file")' | awk '{print \$1}'")
+    local remote_checksum=$(ssh -P $SCP_PORT "$SCP_USER@$SCP_HOST" "sha256sum '${SCP_DIR}/$(basename "$file")' | awk '{print \$1}'")
     if [ "$local_checksum" = "$remote_checksum" ]; then 
         echo "파일 무결성 체크 완료. 이상 무" | tee -a $LOG_FILE
     else
