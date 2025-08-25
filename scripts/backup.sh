@@ -25,7 +25,7 @@ backup_directory(){
     local target_dir=$1
     local output_file=""$BACKUP_DIR"/dir_"$TIMESTAMP".tar.gz"
     echo "$target_dir >>>>>>>> $output_file 으로 백업 중...." | tee -a $LOG_FILE >&2
-    tar -czvf "$output_file" "$target_dir"
+    tar -czf "$output_file" "$target_dir"
     echo ""$output_file" 백업이 완료되었습니다" >&2
     echo "$output_file"
     
@@ -84,8 +84,13 @@ while :; do
             fi 
 
             file=$(backup_directory "$dir")
+            echo "===================================="
+            echo "$file"
+            echo "===================================="
+
             read -p "백업서버에도 scp로 저장할까요?(y/n) " ans
-            if [[ ${ans} ~= ^[Yy]$ ]] ; then 
+            if [[ ${ans} =~ ^[Yy]$ ]] ; then
+
                    upload_scp "$file"
                    verify_checksum "$file"
             else 
@@ -99,10 +104,10 @@ while :; do
                 echo "존재하지 않는 데이터베이스입니다"
                 continue
             fi
-            
+
             file=$(backup_mysql "$db") 
             read -p "백업서버에도 scp로 저장할까요?(y/n) " ans
-            if [[ ${ans} ~= ^[Yy]$ ]] ; then 
+            if [[ ${ans} =~ ^[Yy]$ ]] ; then 
 
                    upload_scp "$file"
                    verify_checksum "$file"
