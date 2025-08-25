@@ -42,8 +42,8 @@ backup_mysql(){
 # 로컬 뿐 아니라 scp를 통해서 다른 백업서버에도 보관하기 
 upload_scp(){
     local file=$1
-    echo "SCP 업로드: $file >>>>>>> $SCP_USER@SCP_HOST:$SCP_DIR" | tee -a $LOG_FILE >&2
-    scp -P $SCP_PORT "$file"  "$SCP_USER@SCP_HOST:$SCP_DIR"
+    echo "SCP 업로드: $file >>>>>>> $SCP_USER@$SCP_HOST:$SCP_DIR" | tee -a $LOG_FILE >&2
+    scp -P $SCP_PORT "$file"  "$SCP_USER@$SCP_HOST:$SCP_DIR"
     echo 
 }
 
@@ -65,7 +65,7 @@ verify_checksum(){
 
 load_config
 mkdir -p $BACKUP_DIR
-while : do 
+while :; do 
     echo "========================"
     echo "InfraOps Toolkit 메인 메뉴"
     echo "1) 디렉토리 백업 "
@@ -78,6 +78,11 @@ while : do
     case "$choice" in
         1) 
             read -p "백업할 디렉토리 경로를 입력해주세요 : " dir 
+            if [ ! -d "$dir" ]; then 
+                echo "디렉토리를 입력해주세요"
+                continue
+            fi 
+
             file=$(backup_directory "$dir")
             read -p "백업서버에도 scp로 저장할까요?(y/n) " ans
             if [[ ${ans} ~= ^[Yy]$ ]] ; then 
@@ -89,6 +94,12 @@ while : do
             ;;
         2) 
             read -p "백업할 데이터베이스를 입력해주세요 : " db
+            DB_EXIST=$(mysql -u "$MYSQL_USER" -p"$MYSQL_PASS" -e "SHOW DATABASES LIKE '$db';" -s --skip-column-names)
+            if [ -z $DB_EXIST ]; then 
+                echo "존재하지 않는 데이터베이스입니다"
+                continue
+            fi
+            
             file=$(backup_mysql "$db") 
             read -p "백업서버에도 scp로 저장할까요?(y/n) " ans
             if [[ ${ans} ~= ^[Yy]$ ]] ; then 
@@ -96,7 +107,7 @@ while : do
                    upload_scp "$file"
                    verify_checksum "$file"
 
-            
+            fi
             echo "백업이 완료되었습니다. "
             ;;
         3) 
@@ -109,7 +120,8 @@ while : do
             echo "프로그램을 종료합니다."
             exit 0 
         ;;
- 
+
+
     esac
 
 
