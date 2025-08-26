@@ -16,26 +16,40 @@ load_config(){
     if [ -f "$CONFIG_FILE" ]; then 
         source "$CONFIG_FILE"
     else
-        echo "config file not found : "$CONFIG_FILE" "
+        echo "[ERROR] config file not found : "$CONFIG_FILE" "
         exit 1 
     fi 
+}
+
+log(){
+    local level=$1
+    local mesg=$2
+    LOG_TIMESTAMP=$(date "+%y%m%d_%H%M%S")
+
+    echo "$mesg" >&2
+    echo "[$LOG_TIMESTAMP][$level] $mesg" >> $LOG_FILE 
 }
 
 #첫번째 인수로 받은 디렉토리를 백업폴더로 백업하는 함수 
 backup_directory(){
     local target_dir=$1
     local output_file=""$BACKUP_DIR"/dir_"$TIMESTAMP".tar.gz"
-    echo "$target_dir >>>>>>>> $output_file 으로 백업 중...." | tee -a $LOG_FILE >&2
+    log "INFO" "$target_dir >>>>>>>> $output_file 으로 백업 중...." 
+
+    
     tar -czf "$output_file" "$target_dir"
-    echo ""$output_file" 백업이 완료되었습니다" >&2
-    echo "$output_file"
+    log "INFO" "$output_file 디렉토리 백업이 완료되었습니다"
+         echo "$output_file"
     
 }
 
 backup_mysql(){
     local db_name=$1
     local output_file="$BACKUP_DIR"/mysql_${db_name}_${TIMESTAMP}.sql.gz 
-    echo "$db_name >>>> $output_file 으로 백업 중...." | tee -a $LOG_FILE >&2
+    
+    log "INFO" "$db_name >>>> $output_file 으로 백업 중...."
+
+    
     mysqldump -u $MYSQL_USER -p"$MYSQL_PASS" ${db_name} | gzip > $output_file
     echo "$output_file"
 }
@@ -43,8 +57,15 @@ backup_mysql(){
 # 로컬 뿐 아니라 scp를 통해서 다른 백업서버에도 보관하기 
 upload_scp(){
     local file=$1
-    echo "SCP 업로드: $file >>>>>>> $SCP_USER@$SCP_HOST:$SCP_DIR" | tee -a $LOG_FILE >&2
-    scp -P $SCP_PORT "$file"  "$SCP_USER@$SCP_HOST:$SCP_DIR"
+    log "INFO" "SCP 업로드: $file >>>>>>> $SCP_USER@$SCP_HOST:$SCP_DIR" 
+
+    
+    if scp -P $SCP_PORT "$file"  "$SCP_USER@$SCP_HOST:$SCP_DIR"; then 
+        log "INFO" "업로드 성공" 
+    else
+        log "ERROR" "SCP 업로드 실패" 
+        return 1
+    fi 
     echo 
 }
 
@@ -52,14 +73,15 @@ upload_scp(){
 verify_checksum(){
     local file=$1
     local local_checksum=$(sha256sum "$file" | awk '{print $1}')
-    echo "여기가 문제냐 "
     local remote_checksum=$(ssh -p $SCP_PORT "$SCP_USER@$SCP_HOST" "sha256sum '${SCP_DIR}/$(basename "$file")' | awk '{print \$1}'")
-    echo "아니면 문제냐 "
+
 
     if [ "$local_checksum" = "$remote_checksum" ]; then 
-        echo "파일 무결성 체크 완료. 이상 무" | tee -a $LOG_FILE
+        log "INFO" "파일 무결성 체크 완료. 이상 무" 
+    
     else
-        echo "파일 무결성 이상 발생. 손실 확인" | tee -a $LOG_FILE >&2
+        log "ERROR" "파일 무결성 이상 발생. 손실 확인" 
+
     fi 
 }  
 
@@ -74,7 +96,7 @@ while :; do
     echo "InfraOps Toolkit 메인 메뉴"
     echo "1) 디렉토리 백업 "
     echo "2) Mysql 백업 "
-    echo "3) 로그 확인 "
+    echo "3) 최근 로그 확인 "
     echo "0) 프로그램 종료"
     echo "========================"
 
@@ -92,8 +114,9 @@ while :; do
             read -p "백업서버에도 scp로 저장할까요?(y/n) " ans
             if [[ ${ans} =~ ^[Yy]$ ]] ; then
 
-                   upload_scp "$file"
-                   verify_checksum "$file"
+                    if  upload_scp "$file"; then 
+                        verify_checksum "$file"
+                    fi
             else 
                 echo "디렉토리 백업이 완료되었습니다. "
             fi 
@@ -104,7 +127,7 @@ while :; do
             read -p "백업할 데이터베이스를 입력해주세요 : " db
             DB_EXIST=$(mysql -u "$MYSQL_USER" -p"$MYSQL_PASS" -e "SHOW DATABASES LIKE '$db';" -s --skip-column-names)
             if [ -z "$DB_EXIST" ]; then 
-                echo "존재하지 않는 데이터베이스입니다"
+                log "ERROR" "존재하지 않는 데이터베이스입니다"
                 continue
             fi
 
@@ -112,8 +135,9 @@ while :; do
             read -p "백업서버에도 scp로 저장할까요?(y/n) " ans
             if [[ ${ans} =~ ^[Yy]$ ]] ; then 
 
-                   upload_scp "$file"
-                   verify_checksum "$file"
+                if  upload_scp "$file"; then 
+                    verify_checksum "$file"
+                fi
 
             fi
             echo "백업이 완료되었습니다. "
