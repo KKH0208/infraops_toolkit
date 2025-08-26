@@ -3,10 +3,11 @@
 
 #========== 설정 =============
 
-SCRIPT_DIR=$(cd "$(dirname $0)" && pwd )
+SCRIPT_DIR=$(cd "$(dirname $0)/../" && pwd )
 CONFIG_FILE="$SCRIPT_DIR"/../config/backup.conf
 TIMESTAMP=$(date "+%y%m%d_%H%M%S")
-BACKUP_DIR="$SCRIPT_DIR"/../reports/backup
+$(cd $SCRIPT_DIR/../ | pwd )
+BACKUP_DIR="$SCRIPT_DIR"/reports/backup
 LOG_FILE=$BACKUP_DIR/backup.$TIMESTAMP.log
 
 #========== 함수 =============
@@ -83,14 +84,11 @@ while :; do
         1) 
             read -p "백업할 디렉토리 경로를 입력해주세요 : " dir 
             if [ ! -d "$dir" ]; then 
-                echo "디렉토리를 입력해주세요"
+                echo "유효한 디렉토리를 입력해주세요"
                 continue
             fi 
 
             file=$(backup_directory "$dir")
-            echo "===================================="
-            echo "$file"
-            echo "===================================="
 
             read -p "백업서버에도 scp로 저장할까요?(y/n) " ans
             if [[ ${ans} =~ ^[Yy]$ ]] ; then
