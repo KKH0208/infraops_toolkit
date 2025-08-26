@@ -4,7 +4,7 @@
 #========== 설정 =============
 
 SCRIPT_DIR=$(cd "$(dirname $0)/../" && pwd )
-CONFIG_FILE="$SCRIPT_DIR"/../config/backup.conf
+CONFIG_FILE="$SCRIPT_DIR"/config/backup.conf
 TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 BACKUP_DIR="$SCRIPT_DIR"/reports/backup
 LOG_FILE=$BACKUP_DIR/backup.$TIMESTAMP.log
