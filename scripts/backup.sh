@@ -1,3 +1,4 @@
+ 
 #!/bin/bash 
 
 #========== 설정 =============
@@ -52,7 +53,7 @@ verify_checksum(){
     local file=$1
     local local_checksum=$(sha256sum "$file" | awk '{print $1}')
     echo "여기가 문제냐 "
-    local remote_checksum=$(ssh -P $SCP_PORT "$SCP_USER@$SCP_HOST" "sha256sum '${SCP_DIR}/$(basename "$file")' | awk '{print \$1}'")
+    local remote_checksum=$(ssh -p $SCP_PORT "$SCP_USER@$SCP_HOST" "sha256sum '${SCP_DIR}/$(basename "$file")' | awk '{print \$1}'")
     echo "아니면 문제냐 "
 
     if [ "$local_checksum" = "$remote_checksum" ]; then 
