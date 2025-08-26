@@ -102,9 +102,11 @@ while :; do
             fi 
             ;;
         2) 
+            echo "========== 선택 가능한 데이터베이스 목록 =========="
+            mysql -u "$MYSQL_USER" -p"$MYSQL_PASS" -e "SHOW DATABASES
             read -p "백업할 데이터베이스를 입력해주세요 : " db
             DB_EXIST=$(mysql -u "$MYSQL_USER" -p"$MYSQL_PASS" -e "SHOW DATABASES LIKE '$db';" -s --skip-column-names)
-            if [ -z $DB_EXIST ]; then 
+            if [ -z "$DB_EXIST" ]; then 
                 echo "존재하지 않는 데이터베이스입니다"
                 continue
             fi
@@ -128,6 +130,9 @@ while :; do
         0) 
             echo "프로그램을 종료합니다."
             exit 0 
+        
+        *) 
+            echo "잘못된 입력입니다. 다시 선택해주세요."
         ;;
 
 
