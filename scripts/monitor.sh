@@ -12,9 +12,13 @@ SCRIPT_DIR=$(cd "$(dirname $0)/../" && pwd )
 TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 LOG_FILE=$SCRIPT_DIR/reports/monitor_$TIMESTAMP.log
 
-CHANNEL_NAME="#server-notification"
-WEBHOOK_URL="https://hooks.slack.com/services/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"
+
+
+#웹훅 URL은 깃에 올리면 보안상 삭제가 되기 때문에 로컬 환경변수로 사용하는걸 추천
+#WEBHOOK_URL="your webhook URL"
 USERNAME="webhootbot"
+CHANNEL_NAME="#server-notification"
+
 
 
 CPU_THRESHOLD=10
@@ -37,20 +41,22 @@ monitor_server(){
     CPU=$(top -bn 1 | grep "%Cpu" | awk '{print int($2+$4)}')
     if [ $CPU -gt $CPU_THRESHOLD ]; then 
         log "[WARN]" "Cpu 사용량이 높습니다."
-        send_alert "서버 Cpu 사용량이 높습니다. 확인 부탁드립니다."
+        #send_alert "서버 Cpu 사용량이 높습니다. 확인 부탁드립니다."
     fi 
 
     MEM=$(free | awk '/Mem:/ {printf( "%d",$3/$2*100)}')
     if [ $MEM -gt $MEM_THRESHOLD ]; then 
         log "[WARN]" "Memory 사용량이 높습니다." 
-        send_alert "서버 메모리 사용량이 높습니다. 확인 부탁드립니다."
+        #send_alert "서버 메모리 사용량이 높습니다. 확인 부탁드립니다."
+        send_alert "test"
+
 
     fi 
 
     DISK=$(df -h / | awk ' NR==2 {gsub(/%/,"",$5); print $5}') 
     if [ $DISK -gt $DISK_THRESHOLD ]; then 
         log "[WARN]" "Disk 사용량이 높습니다." 
-        send_alert "서버 디스크 사용량이 높습니다. 확인 부탁드립니다."
+        #send_alert "서버 디스크 사용량이 높습니다. 확인 부탁드립니다."
 
     fi 
 }
@@ -58,9 +64,9 @@ monitor_server(){
 send_alert(){
     MSG=$1
     
-    curl -X POST --data-urlencode "payload={\"channel\": \"$CHANNEL_NAME\", \"username\": \"$USERNAME\", \"text\": \"$MSG.\", \"icon_emoji\": \":ghost:\"}" $WEBHOOK_URL
+    curl -X POST --data-urlencode "payload={\"channel\": \"$CHANNEL_NAME\", \"username\": \"$USERNAME\", \"text\": \"$MSG\", \"icon_emoji\": \":ghost:\"}" $WEBHOOK_URL 
 }
-#    curl -X POST --data-urlencode "payload={\"channel\": \"#server-notification\", \"username\": \"webhootbot\", \"text\": \"test\", \"icon_emoji\": \":ghost:\"}" https://hooks.slack.com/services/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
+
 
 #========== 메인 ============
 
