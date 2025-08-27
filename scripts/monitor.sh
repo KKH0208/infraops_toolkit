@@ -47,7 +47,7 @@ monitor_server(){
     MEM=$(free | awk '/Mem:/ {printf( "%d",$3/$2*100)}')
     if [ $MEM -gt $MEM_THRESHOLD ]; then 
         log "[WARN]" "Memory 사용량이 높습니다." 
-        #send_alert "서버 메모리 사용량이 높습니다. 확인 부탁드립니다."
+        send_alert "서버 메모리 사용량이 높습니다. 확인 부탁드립니다."
         send_alert "test"
 
 
