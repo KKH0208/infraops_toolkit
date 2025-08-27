@@ -41,14 +41,14 @@ monitor_server(){
     CPU=$(top -bn 1 | grep "%Cpu" | awk '{print int($2+$4)}')
     if [ $CPU -gt $CPU_THRESHOLD ]; then 
         log "[WARN]" "Cpu 사용량이 높습니다."
-        #send_alert "서버 Cpu 사용량이 높습니다. 확인 부탁드립니다."
+        send_alert "서버 Cpu 사용량이 높습니다. 확인 부탁드립니다."
     fi 
 
     MEM=$(free | awk '/Mem:/ {printf( "%d",$3/$2*100)}')
     if [ $MEM -gt $MEM_THRESHOLD ]; then 
         log "[WARN]" "Memory 사용량이 높습니다." 
         send_alert "서버 메모리 사용량이 높습니다. 확인 부탁드립니다."
-        send_alert "test"
+  
 
 
     fi 
@@ -56,7 +56,7 @@ monitor_server(){
     DISK=$(df -h / | awk ' NR==2 {gsub(/%/,"",$5); print $5}') 
     if [ $DISK -gt $DISK_THRESHOLD ]; then 
         log "[WARN]" "Disk 사용량이 높습니다." 
-        #send_alert "서버 디스크 사용량이 높습니다. 확인 부탁드립니다."
+        send_alert "서버 디스크 사용량이 높습니다. 확인 부탁드립니다."
 
     fi 
 }
