@@ -13,7 +13,7 @@ TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 LOG_FILE=$SCRIPT_DIR/reports/monitor_$TIMESTAMP.log
 
 CHANNEL_NAME="#server-notification"
-WEBHOOK_URL="https://hooks.slack.com/services/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"
+WEBHOOK_URL="https://hooks.slack.com/services/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"
 USERNAME="webhootbot"
 
 
@@ -58,8 +58,10 @@ monitor_server(){
 send_alert(){
     MSG=$1
     
-    curl -X POST --data-urlencode "payload={\"channel\": \"#$CHANNEL_NAME\", \"username\": \"$USERNAME\", \"text\": \"$MSG.\", \"icon_emoji\": \":ghost:\"}" $WEBHOOK_URL
+    curl -X POST --data-urlencode "payload={\"channel\": \"$CHANNEL_NAME\", \"username\": \"$USERNAME\", \"text\": \"$MSG.\", \"icon_emoji\": \":ghost:\"}" $WEBHOOK_URL
 }
+#    curl -X POST --data-urlencode "payload={\"channel\": \"#server-notification\", \"username\": \"webhootbot\", \"text\": \"test\", \"icon_emoji\": \":ghost:\"}" https://hooks.slack.com/services/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
+
 #========== 메인 ============
 
 
