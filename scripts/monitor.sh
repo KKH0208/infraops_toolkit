@@ -13,7 +13,7 @@ TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 LOG_FILE=$SCRIPT_DIR/reports/monitor_$TIMESTAMP.log
 
 CHANNEL_NAME="#server-notification"
-WEBHOOK_URL="https://hooks.slack.com/services/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"
+WEBHOOK_URL="https://hooks.slack.com/services/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"
 USERNAME="webhootbot"
 
 
