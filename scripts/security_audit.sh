@@ -76,12 +76,12 @@ U_01(){
 
     echo "========== ssh 설정 확인 ============"
     if [ -f /etc/ssh/sshd_config ]; then 
-        if grep -qE "^[[:space:]]*passwordAuthentication[[:space:]]+yes" /etc/ssh/sshd_config; then 
+        if sudo grep -qE "^[[:space:]]*passwordAuthentication[[:space:]]+yes" /etc/ssh/sshd_config; then 
             log "WARN" "passwordAuthentication yes 발견"
             ((ssh_warn +=1))
         fi 
 
-        if grep -qE "^[[:space:]]*PermitRootLogin[[:space:]]+yes" /etc/ssh/sshd_config; then 
+        if sudo grep -qE "^[[:space:]]*PermitRootLogin[[:space:]]+yes" /etc/ssh/sshd_config; then 
             log "WARN" "PermitRootLogin yes 발견"
             ((ssh_warn +=1))
         fi  
@@ -89,7 +89,7 @@ U_01(){
         log "WARN" "ssh설정파일이 없습니다. ssh 설치 여부를 확인해주세요"
         ((ssh_warn +=1))
     fi 
-    
+
 
     if [ $only_tty_root_login -eq 1 ] && [ $ssh_warn -eq 0 ]; then 
         log "INFO" "U_01테스트 결과 안전"
