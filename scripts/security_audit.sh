@@ -49,6 +49,24 @@ audit_server(){
 
 }
 
+check_password_quality(){
+    local key=$1 
+    local min=$2
+    local value=$(grep -E "^[[:space:]]*$1[[:space:]]*=" "$file" | awk -F'=' '{gsub(/ /,"",$2); print $2}')
+
+    if grep -qE "^[[:space:]]*$1[[:space:]]*=" "$file" ; then 
+            if [ -n $value ] && [ $value -ge $min ]; then 
+                log "INFO" "$key 설정 통과"
+                ((password_test+=1))
+            else
+                log "WARN" "$key 설정 부족"
+        fi 
+    else 
+        log "WARN" "${key}이 설정되지 않았습니다"
+    fi 
+
+}
+
 
 U_01(){
     local only_tty_root_login=0
@@ -103,23 +121,7 @@ U_01(){
     fi
     
 }
-check_password_quality(){
-    local key=$1 
-    local min=$2
-    local value=$(grep -E "^[[:space:]]*$1[[:space:]]*=" "$file" | awk -F'=' '{gsub(/ /,"",$2); print $2}')
 
-    if grep -qE "^[[:space:]]*$1[[:space:]]*=" "$file" ; then 
-            if [ -n $value ] && [ $value -ge $min ]; then 
-                log "INFO" "$key 설정 통과"
-                ((password_test+=1))
-            else
-                log "WARN" "$key 설정 부족"
-        fi 
-    else 
-        log "WARN" "${key}이 설정되지 않았습니다"
-    fi 
-
-}
 
 
 password_test=0
@@ -149,6 +151,28 @@ U_02(){
         log "WARN" "U_02테스트 결과 취약"
     fi        
 }
+
+U_03(){
+    #계정 잠금 임계값이 10회 이하의 값으로 설정되어 있으면 통과
+    file="/etc/pam.d/system-auth"
+    echo "========== 계정 잠금 임계값 설정 ============"
+    if [ -f $file ]; then 
+        if sudo grep -qE "^\s*auth\s+required\s+/lib/security/pam_tally.so" "$file"; then 
+            value=$(sudo grep "/lib/security/pam_tally.so" "$file" | grep -oP 'deny\s*=\s*\K[0-9]+')
+            if [[ "$value" =~ ^[0-9]+$  ]] && [ $value -le 10 ]; then 
+                log "INFO" "계정 잠금 임계값 결과 양호"
+            else
+                log "WARN" "deny설정이 없거나 10회 이상입니다"
+            fi 
+        else 
+            log "WARN" "pam_tally.so모듈을 사용하고 있지 않습니다"
+        fi
+    else 
+        log "WARN" "/etc/pam.d/system-auth 파일을 찾을 수 없습니다"
+    fi
+
+}
+# auth required /lib/security/pam_tally.so 블라블라 deny=5 라는 패턴이 들어가 있으면 최소 기준은 맞춘거네 
 
 
 #========== 메인 ============
