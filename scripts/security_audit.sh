@@ -109,7 +109,7 @@ check_password_quality(){
     local value=$(grep -E "^[[:space:]]*$1[[:space:]]*=" "$file" | awk -F'=' '{gsub(/ /,"",$2); print $2}')
 
     if grep -qE "^[[:space:]]*$1[[:space:]]*=" "$file" ; then 
-            if [ -n $value ] && [ $value -ge $1 ]; then 
+            if [ -n $value ] && [ $value -ge $min ]; then 
                 log "INFO" "$key 설정 통과"
                 ((password_test+=1))
             else
