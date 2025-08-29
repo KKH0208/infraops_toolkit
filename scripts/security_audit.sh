@@ -98,14 +98,90 @@ U_01(){
     if [ $only_tty_root_login -eq 1 ] && [ $ssh_warn -eq 0 ]; then 
         log "INFO" "U_01테스트 결과 안전"
     else
-        log "WARN" "U_02테스트 결과 취약"
+        log "WARN" "U_01테스트 결과 취약"
+    fi
+    
+}
+U_02(){
+    echo "========== 패스워드 복잡성 설정 ============"
+    local lcredit=1 #소문자 최소 1자 이상 요구
+    local ucredit=1 #최소 대문자 1자 이상 요구
+    local dcredit=1 #최소 숫자 1자 이상 요구
+    local ocredit=1 #최소 특수문자 1자 이상 요구
+    local minlen=8  #최소 패스워드 길이 8자 이상 
+    local file="/etc/security/pwquality.conf"
+    local password_test=0
+    if [ -f "$file" ]; then 
+        if grep -qE "^[[:space:]]*lcredit[[:space:]]*=" "$file" ; then 
+            lcredit_value=$(grep -E "^[[:space:]]*lcredit[[:space:]]*=" "$file" | awk -F'=' '{gsub(/ /,"",$2); print $2}')
+            if [ -n $lcredit_value ] && [ $lcredit_value -ge $lcredit ]; then 
+                log "INFO" "소문자 최소 설정 통과"
+                ((password_test+=1))
+            else
+                log "WARN" "소문자 최소 길이 부족"
+            fi 
+        else 
+            log "WARN" "lcredit이 설정되지 않았습니다"
+        fi 
+
+        if grep -qE "^[[:space:]]*ucredit[[:space:]]*=" "$file" ; then 
+            ucredit_value=$(grep -E "^[[:space:]]*ucredit[[:space:]]*=" "$file" | awk -F'=' '{gsub(/ /,"",$2); print $2}')
+            if [ -n $ucredit_value ] && [ $ucredit_value -ge $ucredit ]; then 
+                log "INFO" "대문자 최소 설정 통과"
+                ((password_test+=1))
+            else
+                log "WARN" "대문자 최소 길이 부족"
+            fi 
+        else 
+            log "WARN" "ucredit이 설정되지 않았습니다"
+        fi 
+
+        if grep -qE "^[[:space:]]*dcredit[[:space:]]*=" "$file" ; then 
+            dcredit_value=$(grep -E "^[[:space:]]*dcredit[[:space:]]*=" "$file" | awk -F'=' '{gsub(/ /,"",$2); print $2}')
+            if [ -n $dcredit_value ] && [ $dcredit_value -ge $dcredit ]; then 
+                log "INFO" "숫자 최소 설정 통과"
+                ((password_test+=1))
+            else
+                log "WARN" "숫자 최소 길이 부족"
+        fi 
+        else 
+            log "WARN" "dcredit이 설정되지 않았습니다"
+        fi 
+
+        if grep -qE "^[[:space:]]*ocredit[[:space:]]*=" "$file" ; then 
+            ocredit_value=$(grep -E "^[[:space:]]*ocredit[[:space:]]*=" "$file" | awk -F'=' '{gsub(/ /,"",$2); print $2}')
+            if [ -n $ocredit_value ] && [ $ocredit_value -ge $ocredit ]; then 
+                log "INFO" "특수문자 최소 설정 통과"
+                ((password_test+=1))
+            else
+                log "WARN" "특수문자 최소 길이 부족"
+            fi 
+        else 
+            log "WARN" "ocredit이 설정되지 않았습니다"
+        fi 
+        
+        if grep -qE "^[[:space:]]*minlen[[:space:]]*=" "$file" ; then 
+            minlen_value=$(grep -E "^[[:space:]]*minlen[[:space:]]*=" "$file" | awk -F'=' '{gsub(/ /,"",$2); print $2}')
+            if [ -n $minlen_value ] && [ $minlen_value -ge $minlen ]; then 
+                log "INFO" "패스워드 최소 길이 설정 통과"
+                ((password_test+=1))
+            else
+                log "WARN" "패스워드 최소 길이 부족"
+            fi 
+        else 
+            log "WARN" "minlen이 설정되지 않았습니다"
+        fi 
+
+    else 
+        log "WARN" "pwquality.conf 파일이 없습니다."
     fi
 
-
-
-        
+    if [ $password_test -eq 5 ]; then 
+        log "INFO" "U_02테스트 결과 안전"
+    else
+        log "WARN" "U_02테스트 결과 취약"
+    fi        
 }
-
 
 
 #========== 메인 ============
@@ -113,6 +189,7 @@ U_01(){
 
 load_config
 U_01
+U_02
 
 
 
