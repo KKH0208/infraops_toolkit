@@ -79,11 +79,15 @@ U_01(){
         if sudo grep -qE "^[[:space:]]*passwordAuthentication[[:space:]]+yes" /etc/ssh/sshd_config; then 
             log "WARN" "passwordAuthentication yes 발견"
             ((ssh_warn +=1))
+        else
+            log "INFO" "원격 비밀번호 로그인 불가능 설정 확인"
         fi 
 
         if sudo grep -qE "^[[:space:]]*PermitRootLogin[[:space:]]+yes" /etc/ssh/sshd_config; then 
             log "WARN" "PermitRootLogin yes 발견"
             ((ssh_warn +=1))
+        else
+            log "INFO" "원격 루트 로그인 불가능 설정 확인"
         fi  
     else
         log "WARN" "ssh설정파일이 없습니다. ssh 설치 여부를 확인해주세요"
