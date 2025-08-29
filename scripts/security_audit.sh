@@ -155,12 +155,14 @@ U_02(){
 U_03(){
     #계정 잠금 임계값이 10회 이하의 값으로 설정되어 있으면 통과
     file="/etc/pam.d/system-auth"
+    U_03_result=0
     echo "========== 계정 잠금 임계값 설정 ============"
     if [ -f $file ]; then 
         if sudo grep -qE "^\s*auth\s+required\s+/lib/security/pam_tally.so" "$file"; then 
             value=$(sudo grep "/lib/security/pam_tally.so" "$file" | grep -oP 'deny\s*=\s*\K[0-9]+')
             if [[ "$value" =~ ^[0-9]+$  ]] && [ $value -le 10 ]; then 
                 log "INFO" "계정 잠금 임계값 결과 양호"
+                $U_03_result=1
             else
                 log "WARN" "deny설정이 없거나 10회 이상입니다"
             fi 
@@ -171,10 +173,28 @@ U_03(){
         log "WARN" "/etc/pam.d/system-auth 파일을 찾을 수 없습니다"
     fi
 
+    if [ $U_03_result -eq 1 ]; then 
+        log "INFO" "U_03테스트 결과 안전"
+    else
+        log "WARN" "U_03테스트 결과 취약"
+    fi  
+
 }
-# auth required /lib/security/pam_tally.so 블라블라 deny=5 라는 패턴이 들어가 있으면 최소 기준은 맞춘거네 
+
+U_04(){
+    echo "========== 패스워드 파일 보호 ============"
+    if [ $(awk -F':' '$2 != "x"' /etc/passwd | wc -l) -gt 0 ]; then 
+        log "WARN" "섀도 패스워드가 설정되어 있지 않습니다"
+        log "WARN" "U_04테스트 결과 취약"
+
+    else
+        log "INFO" "U_03테스트 결과 안전"
+    fi 
+}
 
 
+
+}
 #========== 메인 ============
 
 
@@ -182,6 +202,7 @@ load_config
 U_01
 U_02
 U_03
+U_04
 
 
 
