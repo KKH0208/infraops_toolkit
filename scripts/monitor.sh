@@ -1,6 +1,3 @@
-# 메일은 일단 실패했고 スラック로 보내는법 찾아보자 훨씬 간단한 듯 하다. 
-
-
 #!/bin/bash
 # monitor.sh - 서버 리소스 모니터링 및 알림
 # cpu/mem/disk사용량 확인하고 임계치 이상이면 알람 보내는 스크립트 
@@ -9,15 +6,9 @@
 
 #========== 설정 ============
 SCRIPT_DIR=$(cd "$(dirname $0)/../" && pwd )
+CONFIG_FILE="$SCRIPT_DIR"/config/slack.conf
 TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 LOG_FILE=$SCRIPT_DIR/reports/monitor_$TIMESTAMP.log
-
-
-
-#웹훅 URL은 깃에 올리면 보안상 삭제가 되기 때문에 로컬 환경변수로 사용하는걸 추천
-#WEBHOOK_URL="your webhook URL"
-USERNAME="webhootbot"
-CHANNEL_NAME="#server-notification"
 
 
 
@@ -26,6 +17,16 @@ MEM_THRESHOLD=15
 DISK_THRESHOLD=10
 
 #========== 함수 ============
+
+# 설정 파일에서 변수 불러오는 함수 
+load_config(){
+    if [ -f "$CONFIG_FILE" ]; then 
+        source "$CONFIG_FILE"
+    else
+        echo "[ERROR] config file not found : "$CONFIG_FILE" "
+        exit 1 
+    fi 
+}
 
 log(){
     local level=$1
@@ -49,8 +50,6 @@ monitor_server(){
         log "[WARN]" "Memory 사용량이 높습니다." 
         send_alert "서버 메모리 사용량이 높습니다. 확인 부탁드립니다."
   
-
-
     fi 
 
     DISK=$(df -h / | awk ' NR==2 {gsub(/%/,"",$5); print $5}') 
@@ -63,8 +62,16 @@ monitor_server(){
 
 send_alert(){
     MSG=$1
-    
+    if [ -z $WEBHOOK_URL ]; then 
+        log "[WARN]" "WEBHOOK_URL 환경변수를 설정해주세요"
+        return 1
+    fi
+
     curl -s -X POST --data-urlencode "payload={\"channel\": \"$CHANNEL_NAME\", \"username\": \"$USERNAME\", \"text\": \"$MSG\", \"icon_emoji\": \":ghost:\"}" $WEBHOOK_URL >/dev/null
+    if [ $? -ne 0 ]; then 
+        log "[ERROR]" "slack 알람 전송에 실패했습니다"
+        return 1
+    fi
 }
 
 
