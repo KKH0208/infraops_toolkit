@@ -188,9 +188,43 @@ U_04(){
         log "WARN" "U_04테스트 결과 취약"
 
     else
-        log "INFO" "U_03테스트 결과 안전"
+        log "INFO" "U_04테스트 결과 안전"
     fi 
 }
+
+U_05(){
+    #PATH 환경변수에 “.” 이 맨 앞이나 중간에 포함되지 않은 경우 + ::가 없는 경우 
+    echo "========== 환경변수 경로 점검 ============"
+    warning=$(echo $PATH | grep -E "\.:|::" | wc -l )
+    if [ $warning -gt 0 ]; then 
+        log "WARN" "환경변수 경로에 '.:' 혹은 '::'이 포함되어 있습니다"
+        log "WARN" "U_05테스트 결과 취약"
+
+    else
+        log "INRO" "환경변수 경로 검사 결과 양호"
+        log "INFO" "U_05테스트 결과 안전"
+    fi 
+}
+
+U_06(){
+    # 소유자가 존재하지 않는 파일/ 디렉터리가 존재하는지 
+    echo "========== 파일 및 디렉토리 소유자 점검 ============"
+    nouser_file_num=$(sudo find / -nouser -quit  | wc -l)
+    nogroup_file_num=$(sudo find / -nogroup -quit  | wc -l)
+
+    if [ $nouser_file_num -gt 0 ]; then 
+        log "WARN" "/etc/passwd에 등록되지 않은 유저 소유의 파일 혹은 디렉토리가 존재합니다"
+        log "WARN" "U_06테스트 결과 취약"
+    
+    elif  [ $nogroup_file_num -gt 0 ]; then 
+        log "WARN" "/etc/passwd에 등록되지 않은 그룹 소유의 파일 혹은 디렉토리가 존재합니다"
+        log "WARN" "U_06테스트 결과 취약"
+    else
+        log "INRO" "파일 및 디렉토리 소유자 점검 결과 양호"
+        log "INFO" "U_06테스트 결과 안전"
+    fi 
+
+}   
 
 
 
@@ -203,6 +237,7 @@ U_01
 U_02
 U_03
 U_04
+U_05
 
 
 
