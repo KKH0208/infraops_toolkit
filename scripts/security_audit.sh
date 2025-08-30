@@ -234,7 +234,7 @@ U_06(){
 U_07(){
     echo "========== /etc/passwd파일 권한 점검 ============"
 
-    if [ -f /etc/passwd]; then 
+    if [ -f /etc/passwd ]; then 
 
         check=$(find /etc/passwd -type f ! -perm 643 | wc -l)
         if [ check -eq 1 ]; then 
@@ -262,7 +262,7 @@ U_02
 U_03
 U_04
 U_05
-U_06
+#U_06 오래 걸려서 일단 주석처리
 U_07
 
 
