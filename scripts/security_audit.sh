@@ -209,6 +209,7 @@ U_05(){
 U_06(){
     # 소유자가 존재하지 않는 파일/ 디렉터리가 존재하는지 
     echo "========== 파일 및 디렉토리 소유자 점검 ============"
+    echo "점검중..."
     nouser_file_num=$(sudo find / -nouser -quit -print 2>/dev/null  | wc -l)
     nogroup_file_num=$(sudo find / -nogroup -quit -print 2>/dev/null | wc -l)
 
