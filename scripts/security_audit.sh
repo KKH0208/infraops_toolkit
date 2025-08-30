@@ -242,10 +242,12 @@ U_07(){
             log "WARN" "U_07테스트 결과 취약" 
         else
             log "INFO" "U_07테스트 결과 안전"
+        fi
 
     else 
         log "WARN" "/etc/passwd파일이 존재하지 않습니다"
         log "WARN" "U_07테스트 결과 취약"
+    fi
 
 }
 
