@@ -237,7 +237,7 @@ U_07(){
     if [ -f /etc/passwd ]; then 
 
         check=$(find /etc/passwd -type f ! -perm 643 | wc -l)
-        if [ check -eq 1 ]; then 
+        if [ $check -eq 1 ]; then 
             log "WARN" "/etc/passwd파일의 권한이 큽니다"
             log "WARN" "U_07테스트 결과 취약" 
         else
