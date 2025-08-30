@@ -209,10 +209,14 @@ U_05(){
 U_06(){
     # 소유자가 존재하지 않는 파일/ 디렉터리가 존재하는지 
     echo "========== 파일 및 디렉토리 소유자 점검 ============"
-    nouser_file_num=$(sudo find / -nouser -quit  | wc -l)
-    nogroup_file_num=$(sudo find / -nogroup -quit  | wc -l)
+    nouser_file_num=$(sudo find / -nouser -quit -print 2>/dev/null  | wc -l)
+    nogroup_file_num=$(sudo find / -nogroup -quit -print 2>/dev/null | wc -l)
 
-    if [ $nouser_file_num -gt 0 ]; then 
+    if [ $nouser_file_num -gt 0 ] && [ $nogroup_file_num -gt 0 ]; then 
+        log "WARN" "/etc/passwd에 등록되지 않은 유저와 그룹 소유의 파일 혹은 디렉토리가 존재합니다"
+        log "WARN" "U_06테스트 결과 취약"
+
+    elif [ $nouser_file_num -gt 0 ]; then 
         log "WARN" "/etc/passwd에 등록되지 않은 유저 소유의 파일 혹은 디렉토리가 존재합니다"
         log "WARN" "U_06테스트 결과 취약"
     
