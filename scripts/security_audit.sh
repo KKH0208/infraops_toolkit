@@ -206,84 +206,48 @@ U_05(){
     fi 
 }
 
-# U_06(){
-#     # 소유자가 존재하지 않는 파일/ 디렉터리가 존재하는지 
-#     echo "========== 파일 및 디렉토리 소유자 점검 ============"
-#     echo "점검중..."
-#     nouser_file_num=$(sudo find / -nouser -quit -print 2>/dev/null  | wc -l)
-#     nogroup_file_num=$(sudo find / -nogroup -quit -print 2>/dev/null | wc -l)
-
-#     if [ $nouser_file_num -gt 0 ] && [ $nogroup_file_num -gt 0 ]; then 
-#         log "WARN" "/etc/passwd에 등록되지 않은 유저와 그룹 소유의 파일 혹은 디렉토리가 존재합니다"
-#         log "WARN" "U_06테스트 결과 취약"
-
-#     elif [ $nouser_file_num -gt 0 ]; then 
-#         log "WARN" "/etc/passwd에 등록되지 않은 유저 소유의 파일 혹은 디렉토리가 존재합니다"
-#         log "WARN" "U_06테스트 결과 취약"
-    
-#     elif  [ $nogroup_file_num -gt 0 ]; then 
-#         log "WARN" "/etc/passwd에 등록되지 않은 그룹 소유의 파일 혹은 디렉토리가 존재합니다"
-#         log "WARN" "U_06테스트 결과 취약"
-#     else
-#         log "INRO" "파일 및 디렉토리 소유자 점검 결과 양호"
-#         log "INFO" "U_06테스트 결과 안전"
-#     fi 
-
-# }   
-
 U_06(){
     # 소유자가 존재하지 않는 파일/ 디렉터리가 존재하는지 
     echo "========== 파일 및 디렉토리 소유자 점검 ============"
-    echo -n "점검중"
+    echo "점검중..."
+    nouser_file_num=$(sudo find / -nouser -quit -print 2>/dev/null  | wc -l)
+    nogroup_file_num=$(sudo find / -nogroup -quit -print 2>/dev/null | wc -l)
 
-    # 임시 파일 생성
-    tmp_nouser=$(mktemp)
-    tmp_nogroup=$(mktemp)
-
-    # find를 백그라운드로 실행
-    sudo find / -nouser -print -quit 2>/dev/null > "$tmp_nouser" &
-    pid_nouser=$!
-    sudo find / -nogroup -print -quit 2>/dev/null > "$tmp_nogroup" &
-    pid_nogroup=$!
-
-    # 진행 표시
-    dots=1
-    while kill -0 $pid_nouser 2>/dev/null || kill -0 $pid_nogroup 2>/dev/null; do
-        echo -ne "\r점검중$(printf '.%.0s' $(seq 1 $dots))   "
-        dots=$((dots % 3 + 1))
-        sleep 1
-    done
-
-    # 백그라운드 종료 대기
-    wait $pid_nouser
-    wait $pid_nogroup
-
-    # 점검 완료 표시
-    echo -e "\r점검 완료!           "
-
-    # 결과 읽기
-    nouser_file_num=$(wc -l < "$tmp_nouser")
-    nogroup_file_num=$(wc -l < "$tmp_nogroup")
-
-    # 임시 파일 삭제
-    rm -f "$tmp_nouser" "$tmp_nogroup"
-
-    # 기존 로직대로 결과 로그
     if [ $nouser_file_num -gt 0 ] && [ $nogroup_file_num -gt 0 ]; then 
         log "WARN" "/etc/passwd에 등록되지 않은 유저와 그룹 소유의 파일 혹은 디렉토리가 존재합니다"
         log "WARN" "U_06테스트 결과 취약"
+
     elif [ $nouser_file_num -gt 0 ]; then 
         log "WARN" "/etc/passwd에 등록되지 않은 유저 소유의 파일 혹은 디렉토리가 존재합니다"
         log "WARN" "U_06테스트 결과 취약"
-    elif [ $nogroup_file_num -gt 0 ]; then 
+    
+    elif  [ $nogroup_file_num -gt 0 ]; then 
         log "WARN" "/etc/passwd에 등록되지 않은 그룹 소유의 파일 혹은 디렉토리가 존재합니다"
         log "WARN" "U_06테스트 결과 취약"
     else
         log "INRO" "파일 및 디렉토리 소유자 점검 결과 양호"
         log "INFO" "U_06테스트 결과 안전"
     fi 
-}
 
+}   
+
+U_07(){
+    echo "========== /etc/passwd파일 권한 점검 ============"
+
+    if [ -f /etc/passwd]; then 
+
+        check=$(find /etc/passwd -type f ! -perm 643 | wc -l)
+        if [ check -eq 1 ]; then 
+            log "WARN" "/etc/passwd파일의 권한이 큽니다"
+            log "WARN" "U_07테스트 결과 취약" 
+        else
+            log "INFO" "U_07테스트 결과 안전"
+
+    else 
+        log "WARN" "/etc/passwd파일이 존재하지 않습니다"
+        log "WARN" "U_07테스트 결과 취약"
+
+}
 
 
 
@@ -297,7 +261,7 @@ U_03
 U_04
 U_05
 U_06
-
+U_07
 
 
 #==========공부노트 ============
