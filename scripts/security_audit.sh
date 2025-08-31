@@ -262,27 +262,60 @@ U_07(){
 
 U_08(){
     echo "========== /etc/shadow파일 권한 점검 ============"
-    check_000=$(find /etc/shadow -type f -perm 000 | wc -l )
-    check_400=$(find /etc/shadow -type f -perm 400 | wc -l )
+    if [ -f /etc/shadow ]; then 
 
-    if [ $check_000 -eq 0 ] && [ $check_400 -eq 0 ]; then 
-        log "WARN" "/etc/passwd파일의 권한이 큽니다"
-        log "WARN" "U_08테스트 결과 취약" 
+        check_000=$(find /etc/shadow -type f -perm 000 | wc -l )
+        check_400=$(find /etc/shadow -type f -perm 400 | wc -l )
 
-    else
-        user=$(ls -l /etc/shadow | awk '{print $3}')
-        group=$(ls -l /etc/shadow | awk '{print $4}')
+        if [ $check_000 -eq 0 ] && [ $check_400 -eq 0 ]; then 
+            log "WARN" "/etc/passwd파일의 권한이 큽니다"
+            log "WARN" "U_08테스트 결과 취약" 
 
-        if [ $user = "root" ] && [ $group = "root" ]; then 
-            log "INFO" "U_08테스트 결과 안전"
         else
-            log "WARN" "/etc/shadow파일의 소유자가 root가 아닙니다"
-            log "WARN" "U_08테스트 결과 취약"           
-        fi 
+            user=$(ls -l /etc/shadow | awk '{print $3}')
+            group=$(ls -l /etc/shadow | awk '{print $4}')
 
-        
+            if [ $user = "root" ] && [ $group = "root" ]; then 
+                log "INFO" "U_08테스트 결과 안전"
+            else
+                log "WARN" "/etc/shadow파일의 소유자가 root가 아닙니다"
+                log "WARN" "U_08테스트 결과 취약"           
+            fi 
 
+            
+
+        fi
+    else 
+        log "WARN" "/etc/shadow파일이 존재하지 않습니다"
+        log "WARN" "U_08테스트 결과 취약"
     fi
+
+}
+
+U_09(){
+    echo "========== /etc/hosts파일 권한 점검 ============"
+    if [ -f /etc/hosts ]; then 
+        check=$(find /etc/hosts -type f -perm /0177 | wc -l)
+        if [ $check -eq 1 ]; then 
+            log "WARN" "/etc/hosts 파일의 권한이 큽니다"
+            log "WARN" "U_09테스트 결과 취약" 
+        else
+            user=$(ls -l /etc/hosts | awk '{print $3}')
+            group=$(ls -l /etc/hosts | awk '{print $4}')
+
+            if [ $user = "root" ] && [ $group = "root" ]; then 
+                log "INFO" "U_09테스트 결과 안전"
+            else
+                log "WARN" "/etc/hosts파일의 소유자가 root가 아닙니다"
+                log "WARN" "U_09테스트 결과 취약"           
+            fi
+
+        fi
+
+    else 
+        log "WARN" "/etc/hosts파일이 존재하지 않습니다"
+        log "WARN" "U_09테스트 결과 취약"
+    fi   
 }
 
 
@@ -299,6 +332,7 @@ U_05
 #U_06 오래 걸려서 일단 주석처리
 U_07
 U_08
+U_09
 
 
 #==========공부노트 ============
