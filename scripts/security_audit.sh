@@ -236,12 +236,21 @@ U_07(){
 
     if [ -f /etc/passwd ]; then 
 
-        check=$(find /etc/passwd -type f ! -perm 644 | wc -l)
+        check=$(find /etc -type f -perm /0133 | wc -l)
         if [ $check -eq 1 ]; then 
             log "WARN" "/etc/passwd파일의 권한이 큽니다"
             log "WARN" "U_07테스트 결과 취약" 
         else
-            log "INFO" "U_07테스트 결과 안전"
+            user=$(ls -l /etc/passwd | awk '{print $3}')
+            group=$(ls -l /etc/passwd | awk '{print $4}')
+
+            if [ $user = "root" ] && [ $group = "root" ]; then 
+                log "INFO" "U_07테스트 결과 안전"
+            else
+                log "WARN" "/etc/passwd파일의 소유자가 root가 아닙니다"
+                log "WARN" "U_07테스트 결과 취약"           
+            fi
+
         fi
 
     else 
@@ -249,6 +258,31 @@ U_07(){
         log "WARN" "U_07테스트 결과 취약"
     fi
 
+}
+
+U_08(){
+    echo "========== /etc/shadow파일 권한 점검 ============"
+    check_000=$(find /etc/shadow -type f -perm 000 | wc -l )
+    check_400=$(find /etc/shadow -type f -perm 400 | wc -l )
+
+    if [ $check_000 -eq 0 ] && [ $check_400 -eq 0 ]; then 
+        log "WARN" "/etc/passwd파일의 권한이 큽니다"
+        log "WARN" "U_08테스트 결과 취약" 
+
+    else
+        user=$(ls -l /etc/shadow | awk '{print $3}')
+        group=$(ls -l /etc/shadow | awk '{print $4}')
+
+        if [ $user = "root" ] && [ $group = "root" ]; then 
+            log "INFO" "U_08테스트 결과 안전"
+        else
+            log "WARN" "/etc/shadow파일의 소유자가 root가 아닙니다"
+            log "WARN" "U_08테스트 결과 취약"           
+        fi 
+
+        
+
+    fi
 }
 
 
@@ -264,6 +298,7 @@ U_04
 U_05
 #U_06 오래 걸려서 일단 주석처리
 U_07
+U_08
 
 
 #==========공부노트 ============
@@ -271,3 +306,6 @@ U_07
 # auth required /lib/security/pam_securetty.so
 # 이 모듈은 etc/securetty를 참조해서 루트가 무슨 터미널로 로그인 가능할지 정의한다. 
 # tty는 물리터미널이고 pts는 가상터미널(ssh같은)이기 때문에 루트는 무조건 물리터미널에서만 로그인 가능하게 설정해야 한다. 
+
+#find /etc -type f -perm /0133 | wc -l 
+#여기서 -perm /0133 이거는 --x-wx-wx 이 5개중 하나라도 들어있으면 1이고 하나도 안들어있으면 0
