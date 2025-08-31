@@ -318,6 +318,70 @@ U_09(){
     fi   
 }
 
+#일단은 inetd는 옛날이니까 xinetd만 확인하자 
+U_10(){
+    # “/etc/xinetd.conf” 파일 및 “/etc/xinetd.d/” 하위 모든 파일의 소유자 및 권한 확인
+    #ls –l /etc/xinetd.conf
+    #ls –al /etc/xinetd.d/*
+    #소유자가 root가 아니거나 파일의 권한이 600 이 아닌 경우
+    
+    echo "========== xinetd 관련 파일 권한 점검 ============"
+    
+    xinetd_conf=0 # 만약 검사 통과하면 1됨 
+    xinetd_d=1    # 얘는 디렉토리이기 때문에 일단 1로 해놓고 만약 하나라도 이상하면 0으로 바꾸고 break하는 식
+
+    if [ -f /etc/xinetd.conf ]; then 
+        check=$(find /etc/xinetd.conf -type f -perm 600 | wc -l)
+        if [ $check -eq 1 ]; then 
+            user=$(ls -l /etc/xinetd.conf | awk '{print $3}')
+            group=$(ls -l /etc/xinetd.conf | awk '{print $4}')
+            if [ "$user" = "root" ] && [ "$group" = "root" ]; then 
+                log "INFO" "/etc/xinetd.conf 검사 결과 양호"
+                ((xinetd_conf+=1))
+            else
+                log "WARN" "/etc/xinetd.conf 파일의 소유자가 root가 아닙니다"
+            fi 
+        else 
+            log "WARN" "/etc/xinetd.conf 파일의 권한이 너무 큽니다"
+        fi 
+
+    else 
+        log "WARN" "/etc/xinetd.conf파일이 존재하지 않습니다"
+    fi 
+
+    if [ -d /etc/xinetd.d ]; then 
+        for file in /etc/xinetd.d/*; do 
+            [ -f "$file" ] || continue
+            check=$(find "$file" -type f -perm 600 | wc -l)
+            if [ $check -ne 1 ]; then 
+                log "WARN" "${file}의 파일 권한이 너무 큽니다"
+                ((xinetd_d-=1))
+                break
+            else
+                user=$(ls -l "$file" | awk '{print $3}')
+                group=$(ls -l "$file" | awk '{print $4}')
+                if [ $user != "root" ] || [ $group != "root" ]; then 
+                    log "WARN" "/etc/xinetd.conf 파일의 소유자가 root가 아닙니다"
+                    ((xinetd_d-=1))
+                    break
+
+                fi 
+            fi 
+        done 
+        
+
+    else 
+        log "WARN" "/etc/xinetd.d 디렉토리가 존재하지 않습니다"
+    fi 
+
+    if [ $xinetd_conf -eq 1 ] && [ $xinetd_d -eq 0 ]; then 
+        log "INFO" "U_10테스트 결과 안전"
+    else
+        log "WARN" "U_10테스트 결과 취약"
+    fi 
+
+    
+}
 
 
 #========== 메인 ============
@@ -333,7 +397,7 @@ U_05
 U_07
 U_08
 U_09
-
+U_10
 
 #==========공부노트 ============
 # /etc/pam.d/login에 보면 무슨 모듈을 쓸지 나오는데 밑에 모듈이 있어야 하고 
