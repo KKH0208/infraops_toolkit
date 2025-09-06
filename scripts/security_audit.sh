@@ -435,9 +435,11 @@ U_12(){
     fi 
 }
 
+#중요 파일들에 SUID 혹은 SGID중 하나라도 설정이 되있다면 취약. 
+#파일이 없는건 취약 대상에서 뺌 
 U_13(){
     echo "========== 불필요한 SUID,SGID 점검 ============"
-
+    
     
     check_files=(
     "/sbin/dump"
@@ -474,19 +476,65 @@ U_13(){
         for file in "${warning_files[@]}"; do 
             echo "SUID 혹은 SGID가 설정된 파일: $file"
         done 
-        
+
         log "WARN" "U_13테스트 결과 취약"
     else 
         log "INFO" "U_13테스트 결과 안전"
     fi 
 
+}
 
+#사용자 홈 디렉토리 환경파일의 소유자가 root혹은 자신으로 지정되어있고, root와 소유자만 쓰기가 가능한 경우 
+U_14(){
+    error=0
+   env_files=(
+    ".profile"
+    ".kshrc"
+    ".cshrc"
+    ".bashrc"
+    ".bash_profile"
+    ".login"
+    ".exrc"
+    ".netrc"
+    )
 
+    warning_files=()
+    users=($(ls /home))
 
+    for user in "${users[@]}"; do 
+        for file in "${env_files[@]}"; do 
+            if [ ! -f /home/"$user"/"$file" ]; then 
+                log "INFO" "/home/"$user"/"$file" 환경파일이 존재하지 않습니다"
+                continue
+            fi 
+
+            file_owner=$(ls -al /home/"$user"/"$file" | awk '{print $3}') 
+            if [ $file_owner != "root" ] && [ $file_owner != "$user" ]; then 
+                log "WARN" "/home/"$user"/"$file" 파일 소유자를 확인해주세요"
+                ((error+=1))
+            else
+                check=$(find "/home/"$user"/"$file"" -type f -perm /0022 | wc -l)
+                if [ $check -eq 1 ]; then 
+                    log "WARN" "/home/"$user"/"$file" 파일의 그룹 혹은 아더가 쓰기 기능을 갖고 있습니다"
+                    ((error+=1))
+
+                    continue
+                fi 
+            fi 
+        done 
+    done      
+
+    if [ $error -eq 0 ]; then 
+        log "INFO" "U_14테스트 결과 안전"
+    else 
+        log "WARN" "U_14테스트 결과 취약"
+    fi 
+
+    
+    #이거 그냥 /root랑 /home/돌면서 확인하는게 빠를듯. 일단 /home안에 있는 이름들 다 배열에 저장하고 들어가서 확인하는 식으로 
 
 
 }
-
 #========== 메인 ============
 
 
@@ -504,6 +552,7 @@ U_10
 U_11
 U_12
 U_13
+U_14 
 
 
 
