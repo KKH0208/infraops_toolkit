@@ -379,8 +379,33 @@ U_10(){
     else
         log "WARN" "U_10테스트 결과 취약"
     fi 
+}
 
+U_11(){
+    echo "========== rsyslog.conf 파일 권한 점검 ============"
+    #“syslog.conf” 파일의 소유자가 root가 아니거나 파일의 권한이 640가 아닌 경우 아 래의 보안설정방법에 따라 설정을 변경함
     
+    if [ -f /etc/rsyslog.conf ]; then 
+        check=$(find /etc/rsyslog.conf -type f -perm /0137 | wc -l)
+        if [ $check -eq 1 ]; then 
+            log "WARN" "/etc/rsyslog.conf 파일의 권한이 큽니다"
+            log "WARN" "U_11테스트 결과 취약"
+        else 
+            user=$(ls -l /etc/rsyslog.conf | awk '{print $3}')
+            group=$(ls -l /etc/rsyslog.conf | awk '{print $4}')
+            if [ $user != "root" ] || [ $group != "root" ]; then 
+                log "WARN" "/etc/rsyslog.conf 파일의 소유자가 root가 아닙니다"
+                log "WARN" "U_11테스트 결과 취약"
+            else 
+                log "INFO" "U_11테스트 결과 안전"
+            fi 
+        fi 
+
+            
+
+    else 
+        log "WARN" "/etc/rsyslog.conf 디렉토리가 존재하지 않습니다"
+    fi 
 }
 
 
@@ -398,6 +423,7 @@ U_07
 U_08
 U_09
 U_10
+U_11
 
 #==========공부노트 ============
 # /etc/pam.d/login에 보면 무슨 모듈을 쓸지 나오는데 밑에 모듈이 있어야 하고 
@@ -407,3 +433,5 @@ U_10
 
 #find /etc -type f -perm /0133 | wc -l 
 #여기서 -perm /0133 이거는 --x-wx-wx 이 5개중 하나라도 들어있으면 1이고 하나도 안들어있으면 0
+# xx-x-----
+# --x-xxxxx 1 3 7 
