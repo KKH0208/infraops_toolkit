@@ -535,7 +535,20 @@ U_14(){
     
     #이거 그냥 /root랑 /home/돌면서 확인하는게 빠를듯. 일단 /home안에 있는 이름들 다 배열에 저장하고 들어가서 확인하는 식으로 
 
+}
 
+#아더에 쓰기권한이 있는 파일을 world writable 파일이라고 함 
+#가상파일은 제외하고 이 파일이 있다면 일단 경고 보내기 
+U_15(){
+    echo "========== world writable 파일 점검 ============"
+    ww_files=$(find / -path /proc -prune -o -path /sys -prune -o -path /dev -prune -o -type f -perm -2 2>/dev/null)
+    if [ -n "$ww_files" ]; then 
+        log "INFO" "U_15테스트 결과 안전"
+    else 
+        echo "발견된 world writable 파일: $ww_files"
+        log "WARN" "U_15테스트 결과 취약"
+
+    fi
 }
 #========== 메인 ============
 
@@ -555,6 +568,7 @@ U_11
 U_12
 U_13
 U_14 
+U_15
 
 
 
