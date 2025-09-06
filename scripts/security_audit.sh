@@ -471,6 +471,10 @@ U_13(){
     done 
 
     if [ ${#warning_files[@]} -gt 0 ]; then 
+        for file in "${warning_files[@]}"; do 
+            echo "SUID 혹은 SGID가 설정된 파일: $file"
+        done 
+        
         log "WARN" "U_13테스트 결과 취약"
     else 
         log "INFO" "U_13테스트 결과 안전"
