@@ -435,6 +435,53 @@ U_12(){
     fi 
 }
 
+U_13(){
+    echo "========== 불필요한 SUID,SGID 점검 ============"
+
+    
+    check_files=(
+    "/sbin/dump"
+    "/sbin/restore"
+    "/sbin/unix_chkpwd"
+    "/usr/bin/at"
+    "/usr/bin/lpq"
+    "/usr/bin/lpq-lpd"
+    "/usr/bin/lpr"
+    "/usr/bin/lpr-lpd"
+    "/usr/bin/lprm"
+    "/usr/bin/lprm-lpd"
+    "/usr/bin/newgrp"
+    "/usr/sbin/lpc"
+    "/usr/sbin/lpc-lpd"
+    "/usr/sbin/traceroute"
+    )
+
+    #SUID,SGID가 포함되어 있는 파일 목록을 저장 
+    warning_files=()
+
+    for file in "${check_files[@]}"; do 
+        if [ ! -f $file ]; then 
+            log "WARN" "$file 파일이 존재하지 않습니다."
+        else 
+            if ls -alL $file | awk '{print $1}' | grep -Eq '[sS]|[gG]'; then 
+                warning_files+=("$file") 
+            fi 
+        fi 
+
+    done 
+
+    if [ ${#warning_files[@]} -gt 0 ]; then 
+        log "WARN" "U_13테스트 결과 취약"
+    else 
+        log "INFO" "U_13테스트 결과 안전"
+    fi 
+
+
+
+
+
+
+}
 
 #========== 메인 ============
 
@@ -452,6 +499,8 @@ U_09
 U_10
 U_11
 U_12
+U_13
+
 
 
 #==========공부노트 ============
