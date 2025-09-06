@@ -383,7 +383,7 @@ U_10(){
 
 U_11(){
     echo "========== rsyslog.conf 파일 권한 점검 ============"
-    #“syslog.conf” 파일의 소유자가 root가 아니거나 파일의 권한이 640가 아닌 경우 아 래의 보안설정방법에 따라 설정을 변경함
+    #“syslog.conf” 파일의 소유자가 root가 아니거나 파일의 권한이 640이하인 경우 아래의 보안설정방법에 따라 설정을 변경함
     
     if [ -f /etc/rsyslog.conf ]; then 
         check=$(find /etc/rsyslog.conf -type f -perm /0137 | wc -l)
@@ -404,7 +404,34 @@ U_11(){
             
 
     else 
-        log "WARN" "/etc/rsyslog.conf 디렉토리가 존재하지 않습니다"
+        log "WARN" "/etc/rsyslog.conf 파일이 존재하지 않습니다"
+    fi 
+}
+
+U_12(){
+    echo "========== services 파일 권한 점검 ============"
+    #/etc/services 파일의 소유자가 root가 아니거나 파일의 권한이 644 이하인 경우 아래의 보안설정방법에 따라 설정을 변경함
+    
+    if [ -f /etc/services ]; then 
+        check=$(find /etc/services -type f -perm /0133 | wc -l)
+        if [ $check -eq 1 ]; then 
+            log "WARN" "/etc/services 파일의 권한이 큽니다"
+            log "WARN" "U_12테스트 결과 취약"
+        else 
+            user=$(ls -l /etc/services | awk '{print $3}')
+            group=$(ls -l /etc/services | awk '{print $4}')
+            if [ $user != "root" ] || [ $group != "root" ]; then 
+                log "WARN" "/etc/services 파일의 소유자가 root가 아닙니다"
+                log "WARN" "U_12테스트 결과 취약"
+            else 
+                log "INFO" "U_12테스트 결과 안전"
+            fi 
+        fi 
+
+            
+
+    else 
+        log "WARN" "/etc/services 파일이 존재하지 않습니다"
     fi 
 }
 
