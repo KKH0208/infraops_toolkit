@@ -614,6 +614,16 @@ U_20(){
 
 }
 
+U_21(){
+    echo "========== r 계열 서비스 비활성화 점검 ============"
+    if ls -alL /etc/xinetd.d/*  2>/dev/null | egrep "rsh|rlogin|rexec" | egrep -vq "grep|klogin|kshell|kexec"; then 
+        log "WARN" "r계열 서비스가 실행중입니다."
+        log "WARN" "U_21테스트 결과 취약"
+    else
+        log "INFO" "U_21테스트 결과 안전"
+    fi 
+
+}
 
 #========== 메인 ============
 
@@ -640,7 +650,7 @@ U_16
 U_18
 U_19
 U_20
-
+U_21
 
 
 #==========공부노트 ============
