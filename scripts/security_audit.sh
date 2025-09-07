@@ -599,9 +599,21 @@ U_19(){
         log "WARN" "finger서비스가 활성화 중입니다. "
         log "WARN" "U_19테스트 결과 취약"
     else 
-        log "INFO" "U_19테스트 결과 안전"
+        log "INFO" "U_19테스트 결과 안전" # 단, xinetd를 사용할 경우
     fi
 }
+
+U_20(){
+    echo "========== FTP 계정 유무 점검 ============"
+    if cat /etc/passwd | grep -q "ftp"; then 
+        log "WARN" "FTP계정이 존재합니다"
+        log "WARN" "U_20테스트 결과 취약"
+    else 
+        log "INFO" "U_20테스트 결과 안전"
+    fi 
+
+}
+
 
 #========== 메인 ============
 
