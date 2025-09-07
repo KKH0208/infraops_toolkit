@@ -561,10 +561,41 @@ U_16(){
 
 }
 
+#/etc/hosts.deny 파일에 ALL:ALL 설정이 없거나 /etc/hosts.allow 파일에 ALL:ALL 설정이 있을 경우 취약으로 판단
+U_18(){
+    echo "========== 접속 IP 및 포트 제한 ============"
+
+    if [ -f /etc/hosts.deny ]; then 
+        if grep -Eiq '^\s*ALL\s*:\s*ALL\s*$' /etc/host.deny; then 
+            if [ -f /etc/hosts.allow ]; then 
+                if grep -Eiq '^\s*ALL\s*:\s*ALL\s*$' /etc/host.allow; then 
+                    log "WARN" "/etc/hosts.allow 파일에 ALL:ALL 설정이 있습니다."
+                    log "WARN" "U_18테스트 결과 취약"
+                    break                    
+                else 
+                    log "INFO" "U_18테스트 결과 안전" 
+                    break
+                fi
+            else 
+            log "INFO" "/etc/hosts.allow 파일이 없습니다"
+            log "INFO" "U_18테스트 결과 안전" # /etc/hosts.allow은 없어도 괜찮음.
+            fi
+        else 
+            log "WARN" "/etc/hosts.deny 파일에 ALL:ALL 설정이 없습니다."
+            log "WARN" "U_18테스트 결과 취약"
+            break
+        fi
+
+    else 
+        log "WARN" "/etc/hosts.deny 파일이 없습니다."
+        log "WARN" "tcp_wrappers를 사용중이라면 U_18테스트 결과 취약 "
+    fi 
+}
 
 
 #========== 메인 ============
 
+#이거도 반복문으로 돌려도 될듯? 
 
 load_config
 U_01
@@ -583,6 +614,8 @@ U_13
 U_14 
 U_15
 U_16
+# U_17 뭔지 모르겠다 나중에 확인하자 
+U_18
 
 
 #==========공부노트 ============
