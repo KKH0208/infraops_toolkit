@@ -827,6 +827,33 @@ U_27(){
     
 }
 
+U_28(){
+    echo "========== NIS, NIS+ 점검 ============"
+    error=0
+    services=(
+        ypserv 
+        ypbind 
+        ypxfrd
+        rpc.yppasswdd
+        rpc.ypupdated
+    )
+
+    for service in "${services[@]}"; do 
+        if [ $(systemctl is-active $service) = "active" ]; then 
+            log "WARN" "$service 서비스가 실행중입니다."
+            ((error+=1))
+        fi 
+    done 
+
+    if [ $error -gt 0 ]; then
+        log "WARN" "U_28테스트 결과 취약"
+    else
+        log "INFO" "U_28테스트 결과 안전"
+    fi 
+
+
+}
+
 
 
 #========== 메인 ============
@@ -861,6 +888,8 @@ U_24
 U_25
 U_26
 U_27
+U_28
+
 
 
 
@@ -894,3 +923,9 @@ U_27
 
 # warn, notice, info  3개로 나누는게 좋을듯 U23부터 할게
 # 취약, 안전 말고 점검불가도 쓰자. 
+
+
+
+#systemctl list-units --type=service --all | grep -Eq  "ypserv|ypbind|ypxfrd|rpc.yppasswdd|rpc.ypupdated
+# -> 이건 저 서비스들이 깔려 있으면 출력됨
+# systemctl is-active ypserv 이러면 활성화 여부 확인가능 active 뜨면 실행중. 
