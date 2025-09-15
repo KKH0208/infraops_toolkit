@@ -628,6 +628,7 @@ U_21(){
 U_22(){
     #ls -al /usr/bin/crontab 이 실행파일을 640 이하이고 소유자가 root임을 확인해야 함. 
     #그리고 crontab cron.hourly cron.daily cron.weekly cron.monthly cron.allow cron.deny 이 파일 및 디렉토리에 대해서도 확인해야함
+    echo "========== crond 파일 소유자 및 권한 설정 ============"
     error=0
     files=(
         /usr/bin/crontab
