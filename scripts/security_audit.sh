@@ -728,8 +728,8 @@ U_23(){
 }
 
 U_24(){
-    echo "========== NFS 서비스 비활성화 ============"
-        error=0
+    echo "========== NFS 서비스 점검 ============"
+    error=0
     services=(
         nfs
         statd
@@ -770,6 +770,26 @@ U_25(){
     fi 
 
 }
+
+
+U_26(){
+    echo "========== automountd 서비스 점검 ============"
+    error=0
+
+    if systemctl list-units --type=service --all | grep -q automount; then     
+        log "WARN" "automount 서비스가 동작중입니다."
+        ((error+=1))
+    fi 
+
+
+    if [ $error -gt 0 ]; then
+        log "WARN" "U_24테스트 결과 취약"
+    else
+        log "INFO" "U_24테스트 결과 안전"
+    fi 
+    
+
+}
 #========== 메인 ============
 
 #이거도 반복문으로 돌려도 될듯? 
@@ -800,6 +820,8 @@ U_22
 U_23
 U_24
 U_25
+U_26
+
 
 
 
