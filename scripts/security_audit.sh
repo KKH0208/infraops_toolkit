@@ -658,7 +658,7 @@ U_22(){
                 fi 
             elif [ -d $file ]; then 
                   shopt -s nullglob
-                  for sub_file in $file/*; then 
+                  for sub_file in $file/*; do 
                      check=$(find $sub_file -type f -perm /0137 | wc -l )
                         if [ $check -gt 0 ]; then 
                             log "WARN" "$sub_file 파일의 권한이 너무 큽니다."
