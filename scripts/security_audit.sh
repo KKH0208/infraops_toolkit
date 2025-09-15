@@ -783,13 +783,52 @@ U_26(){
 
 
     if [ $error -gt 0 ]; then
-        log "WARN" "U_24테스트 결과 취약"
+        log "WARN" "U_26테스트 결과 취약"
     else
-        log "INFO" "U_24테스트 결과 안전"
+        log "INFO" "U_26테스트 결과 안전"
     fi 
     
-
 }
+
+U_27(){
+    echo "========== RPC 서비스 점검 ============"
+
+    services=(
+    rpc.cmsd
+    rpc.ttdbserverd
+    sadmind
+    rusersd
+    walld
+    sprayd
+    rstatd
+    rpc.nisd
+    rexd
+    rpc.pcnfsd
+    rpc.statd
+    rpc.ypupdated
+    rpc.rquotad
+    kcms_server
+    cachefsd
+    )
+
+ 
+    for service in "${services[@]}"; do 
+        if systemctl list-units --type=service --all | grep -q $service; then     
+            log "WARN" "$service 서비스가 동작중입니다."
+            ((error+=1))
+        fi 
+    done 
+
+    if [ $error -gt 0 ]; then
+        log "WARN" "U_27테스트 결과 취약"
+    else
+        log "INFO" "U_27테스트 결과 안전"
+    fi 
+
+
+    
+}
+
 #========== 메인 ============
 
 #이거도 반복문으로 돌려도 될듯? 
