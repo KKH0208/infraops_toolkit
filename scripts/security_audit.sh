@@ -628,7 +628,7 @@ U_21(){
 U_22(){
     #ls -al /usr/bin/crontab 이 실행파일을 640 이하이고 소유자가 root임을 확인해야 함. 
     #그리고 crontab cron.hourly cron.daily cron.weekly cron.monthly cron.allow cron.deny 이 파일 및 디렉토리에 대해서도 확인해야함
-    
+    error=0
     files=(
         /usr/bin/crontab
         /etc/crontab
@@ -648,12 +648,15 @@ U_22(){
                 check=$(find $file -type f -perm /0137 | wc -l )
                 if [ $check -gt 0 ]; then 
                     log "WARN" "$file 파일의 권한이 너무 큽니다."
+                    ((error+=1))
                 else
                     file_owner=$(ls -l $file | awk '{print $3}')
                     if [ $file_owner = "root" ]; then 
                         log "INFO" "$file 파일 테스트 결과 양호"
                     else
                         log "WARN" "$file 파일 소유자가 root가 아닙니다."
+                        ((error+=1))
+
                     fi 
                 fi 
             elif [ -d $file ]; then 
@@ -662,12 +665,16 @@ U_22(){
                      check=$(find $sub_file -type f -perm /0137 | wc -l )
                         if [ $check -gt 0 ]; then 
                             log "WARN" "$sub_file 파일의 권한이 너무 큽니다."
+                            ((error+=1))
+
                         else
                             file_owner=$(ls -l $sub_file | awk '{print $3}')
                             if [ $file_owner = "root" ]; then 
                                 log "INFO" "$sub_file 파일 테스트 결과 양호"
                             else
                                 log "WARN" "$sub_file 파일 소유자가 root가 아닙니다."
+                                ((error+=1))
+
                             fi 
                         fi 
                     done 
@@ -677,6 +684,12 @@ U_22(){
             fi 
         fi 
     done 
+
+    if [ $error -eq 0 ]; then 
+        log "INFO" "U_22테스트 결과 안전"
+    else
+        log "WARN" "U_22테스트 결과 취약"
+    fi 
 
 
  
