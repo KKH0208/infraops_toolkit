@@ -855,6 +855,31 @@ U_28(){
 }
 
 
+U_29(){
+    echo "========== tftp, talk 서비스 점검 ============"
+    error=0
+    services=(
+        tftp
+        talk
+        ntalk
+    )
+
+    for service in "${services[@]}"; do 
+        if [ $(systemctl is-active $service) = "active" ]; then 
+            log "WARN" "$service 서비스가 실행중입니다."
+            ((error+=1))
+        fi 
+    done 
+
+    if [ $error -gt 0 ]; then
+        log "WARN" "U_29테스트 결과 취약"
+    else
+        log "INFO" "U_29테스트 결과 안전"
+    fi 
+
+
+}
+
 
 #========== 메인 ============
 
@@ -889,6 +914,8 @@ U_25
 U_26
 U_27
 U_28
+U_29
+
 
 
 
