@@ -813,7 +813,7 @@ U_27(){
 
  
     for service in "${services[@]}"; do 
-        if systemctl list-units --type=service --all | grep -q $service; then     
+        if systemctl list-units --type=service --all | grep -q "^$service"; then     
             log "WARN" "$service 서비스가 동작중입니다."
             ((error+=1))
         fi 
