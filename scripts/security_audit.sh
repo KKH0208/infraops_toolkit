@@ -692,8 +692,39 @@ U_22(){
         log "WARN" "U_22테스트 결과 취약"
     fi 
 
+}
 
+U_23(){
+
+    # redhat 9버전 이후에는 xinetd -> systemctl로 바꼈다고 함 
+    # systemctl로 하자 xinetd는 2013년에 지원 종료됐음. 
+    echo "========== DoS 공격에 취약한 서비스 비활성화  ============"
+    error=0
+    services=(
+        echo
+        discard
+        daytime
+        charge
+        ntp
+        dns 
+        snmp
+    )
  
+    for service in "${services[@]}"; do 
+        if systemctl list-units --type=service --all | grep -q $service; then     
+            log "WARN" "$service 서비스가 동작중입니다."
+            ((error+=1))
+        fi 
+    done 
+
+    if [ $error -gt 0 ]; then
+        log "WARN" "U_23테스트 결과 취약"
+    else
+        log "INFO" "U_23테스트 결과 안전"
+    fi 
+
+
+    
 }
 
 #========== 메인 ============
@@ -723,6 +754,9 @@ U_19
 U_20
 U_21
 U_22
+U_23
+
+
 
 
 
@@ -736,3 +770,18 @@ U_22
 #여기서 -perm /0133 이거는 --x-wx-wx 이 5개중 하나라도 들어있으면 1이고 하나도 안들어있으면 0
 # xx-x-----
 # --x-xxxxx 1 3 7 
+
+
+
+
+# 값 (숫자)	심각도(Level)	설명	예시 로그
+# 0	emerg	시스템이 사용 불가 상태 (치명적)	커널 패닉
+# 1	alert	즉시 조치가 필요한 상태	디스크 장애
+# 2	crit	치명적인 오류	파일시스템 오류
+# 3	err (error)	일반 오류	애플리케이션 실패
+# 4	warn (warning)	경고, 잠재적 문제	설정 경고
+# 5	notice	중요하지만 에러는 아님	서비스 시작 알림
+# 6	info	정보성 메시지	로그인 로그
+# 7	debug	디버깅용 상세 메시지	개발 중 디버깅
+
+# warn, notice, info  3개로 나누는게 좋을듯 U23부터 할게
