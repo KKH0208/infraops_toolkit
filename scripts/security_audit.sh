@@ -901,6 +901,8 @@ U_31(){
     echo "========== 스팸 메일 릴레이 제한 ============"
     if [ $(systemctl is-active sendmail.service ) = "inactive" ]; then 
         log "INFO" "sendmail 서비스 사용중이 아닙니다."
+        log "INFO" "U_31테스트 결과 안전"
+
     else 
         if [ -f /etc/mail/sendmail.cf ]; then 
             if grep -Eq "^[[:space:]]*[^#].*R\$.*550 Relaying denied" /etc/mail/sendmail.cf; then
@@ -920,6 +922,38 @@ U_31(){
     fi 
 
 }
+
+U_32(){
+    echo "========== 일반사용자의 Sendmail 실행 방지 ============"
+
+    if [ $(systemctl is-active sendmail.service ) = "inactive" ]; then 
+            log "INFO" "sendmail 서비스 사용중이 아닙니다."
+            log "INFO" "U_32테스트 결과 안전"
+
+    else 
+        if [ -f /etc/mail/sendmail.cf ]; then 
+            if grep -Eq "^[[:space:]]*[^#]*PrivacyOptions[^#]*restrictqrun" /etc/mail/sendmail.cf; then
+                log "INFO" "일반 사용자의 Sendmail실행 방지가 설정되어 있습니다."
+                log "INFO" "U_32테스트 결과 안전"
+
+            else 
+                log "WARN" "일반 사용자의 Sendmail실행 방지가 설정되어 있지 않습니다."
+                log "WARN" "U_32테스트 결과 취약"
+            fi
+
+        else 
+            log "NOTICE" "/etc/mail/sendmail.cf 파일이 존재하지 않습니다."
+            log "NOTICE" "U_32테스트 점검불가"        
+
+        fi 
+
+    fi 
+    
+}
+
+
+
+
 
 #========== 메인 ============
 
