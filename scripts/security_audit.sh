@@ -1000,42 +1000,6 @@ U_35(){
 
 
 
-U_35() {
-	echo ""  >> $resultfile 2>&1
-	echo "▶ U-35(상) | 3. 서비스 관리 > 3.17 웹서비스 디렉토리 리스팅 제거 ◀"  >> $resultfile 2>&1
-	echo " 양호 판단 기준 : 디렉터리 검색 기능을 사용하지 않는 경우" >> $resultfile 2>&1
-	webconf_files=(".htaccess" "httpd.conf" "apache2.conf" "userdir.conf")
-	for ((i=0; i<${#webconf_files[@]}; i++))
-	do
-		find_webconf_file_count=`find / -name ${webconf_files[$i]} -type f 2>/dev/null | wc -l`
-		if [ $find_webconf_file_count -gt 0 ]; then
-			find_webconf_files=(`find / -name ${webconf_files[$i]} -type f 2>/dev/null`)
-			for ((j=0; j<${#find_webconf_files[@]}; j++))
-			do
-				if [[ ${find_webconf_files[$j]} =~ userdir.conf ]]; then
-					userdirconf_disabled_count=`grep -vE '^#|^\s#'  ${find_webconf_files[$j]} | grep -i 'userdir' | grep -i 'disabled' | wc -l`
-					if [ $userdirconf_disabled_count -eq 0 ]; then
-						userdirconf_indexes_count=`grep -vE '^#|^\s#'  ${find_webconf_files[$j]} | grep -i 'Options' | grep -iv '\-indexes' | grep -i 'indexes' | wc -l`
-						if [ $userdirconf_indexes_count -gt 0 ]; then
-							echo "※ U-35 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-							echo " Apache 설정 파일에 디렉터리 검색 기능을 사용하도록 설정되어 있습니다." >> $resultfile 2>&1
-							return 0
-						fi
-					fi
-				else
-					webconf_file_indexes_count=`grep -vE '^#|^\s#' ${find_webconf_files[$j]} | grep -i 'Options' | grep -iv '\-indexes' | grep -i 'indexes' | wc -l`
-					if [ $webconf_file_indexes_count -gt 0 ]; then
-						echo "※ U-35 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " Apache 설정 파일에 디렉터리 검색 기능을 사용하도록 설정되어 있습니다." >> $resultfile 2>&1
-						return 0
-					fi
-				fi
-			done
-		fi
-	done
-	echo "※ U-35 결과 : 양호(Good)" >> $resultfile 2>&1
-	return 0
-}
 
 #========== 메인 ============
 
