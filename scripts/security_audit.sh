@@ -711,7 +711,8 @@ U_23(){
     )
  
     for service in "${services[@]}"; do 
-        if systemctl list-units --type=service --all | grep -q $service; then     
+        if [ $(systemctl is-active $service) = "active" ]; then 
+    
             log "WARN" "$service 서비스가 동작중입니다."
             ((error+=1))
         fi 
@@ -737,7 +738,7 @@ U_24(){
     )
  
     for service in "${services[@]}"; do 
-        if systemctl list-units --type=service --all | grep -q $service; then     
+        if [ $(systemctl is-active $service) = "active" ]; then 
             log "WARN" "$service 서비스가 동작중입니다."
             ((error+=1))
         fi 
@@ -775,8 +776,8 @@ U_25(){
 U_26(){
     echo "========== automountd 서비스 점검 ============"
     error=0
-
-    if systemctl list-units --type=service --all | grep -q automount; then     
+    if [ $(systemctl is-active automountd) = "active" ]; then 
+    
         log "WARN" "automount 서비스가 동작중입니다."
         ((error+=1))
     fi 
@@ -813,7 +814,8 @@ U_27(){
 
  
     for service in "${services[@]}"; do 
-        if systemctl list-units --type=service --all | grep -q "^$service"; then     
+        if [ $(systemctl is-active $service) = "active" ]; then 
+
             log "WARN" "$service 서비스가 동작중입니다."
             ((error+=1))
         fi 
@@ -880,6 +882,44 @@ U_29(){
 
 }
 
+# 아아 이건 좀 빡세긴 하네 최신버전을 가져오는게 힘들다. 애초에 어디까지를 기준으로 잡을지도 애매하기도 하고 흠.. 패스? 
+# U_30(){
+#     echo "========== Sendmail 버전 점검 ============"
+
+#     if [ $(systemctl is-active sendmail.service ) = "active" ]; then 
+#         version=$(rpm -q sendmail)
+#         if 
+
+
+#     else
+#         log "NOTICE" "Sendmail이 inactive상태입니다."
+#         log "NOTICE" "U_30테스트 점검불가"        
+#     fi  
+# }
+
+U_31(){
+    echo "========== 스팸 메일 릴레이 제한 ============"
+    if [ $(systemctl is-active sendmail.service ) = "inactive" ]; then 
+        log "INFO" "sendmail 서비스 사용중이 아닙니다."
+    else 
+        if [ -f /etc/mail/sendmail.cf ]; then 
+            if grep -Eq "^[[:space:]]*[^#].*R\$.*550 Relaying denied" /etc/mail/sendmail.cf; then
+                log "INFO" "스팸 메일 릴레이 제한이 설정된 상태입니다."
+                log "INFO" "U_31테스트 결과 안전"
+
+            else 
+                log "WARN" "스팸 메일 릴레이 제한을 설정해주세요."
+                log "WARN" "U_31테스트 결과 취약"
+            fi
+
+        else 
+            log "NOTICE" "/etc/mail/sendmail.cf 파일이 존재하지 않습니다."
+            log "NOTICE" "U_31테스트 점검불가"        
+
+        fi 
+    fi 
+
+}
 
 #========== 메인 ============
 
@@ -915,6 +955,8 @@ U_26
 U_27
 U_28
 U_29
+#U_30 최신버전 확인이 빡센데
+U_31
 
 
 
