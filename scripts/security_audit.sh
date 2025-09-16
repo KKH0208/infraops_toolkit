@@ -996,7 +996,29 @@ U_35(){
     fi 
 }
 
-
+U_36(){
+    # /etc/httpd/conf/httpd.conf에서 User root Group root 이런식이면 취약 
+    echo "========== 웹서비스 웹 프로세스 권한 제한 ============"
+    error=0
+    if [ -f /etc/httpd/conf/httpd.conf ]; then   
+        if [ "$(grep -Ev "^[[:space:]]*#" /etc/httpd/conf/httpd.conf | grep "^[[:space:]]*User[[:space:]]*root"  | wc -l )" -gt 0 ]; then 
+            log "WARN" "Apache 데몬이 root 유저 권한으로 작동중입니다."
+            ((error+=1))
+        fi 
+        if [ "$(grep -Ev "^[[:space:]]*#" /etc/httpd/conf/httpd.conf | grep "^[[:space:]]*Group[[:space:]]*root"  | wc -l )" -gt 0 ]; then 
+            log "WARN" "Apache 데몬이 root 그룹 권한으로 작동중입니다."
+            ((error+=1))     
+        fi 
+    else 
+        log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
+        log "NOTICE" "U_36테스트 점검불가"  
+    fi 
+    if [ $error -gt 0 ]; then 
+        log "WARN" "U_36테스트 결과 취약 "   
+    else 
+        log "INFO" "U_36테스트 결과 안전"
+    fi 
+}
 
 
 
@@ -1041,6 +1063,8 @@ U_32
 #U_33 이거도 최신버전 
 U_34
 U_35
+U_36 
+
 
 
 
