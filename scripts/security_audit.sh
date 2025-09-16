@@ -1001,11 +1001,11 @@ U_36(){
     echo "========== 웹서비스 웹 프로세스 권한 제한 ============"
     error=0
     if [ -f /etc/httpd/conf/httpd.conf ]; then   
-        if [ "$(grep -Ev "^[[:space:]]*#" /etc/httpd/conf/httpd.conf | grep "^[[:space:]]*User[[:space:]]*root"  | wc -l )" -gt 0 ]; then 
+        if [ "$(grep "^[[:space:]]*User[[:space:]]*root"  /etc/httpd/conf/httpd.conf | wc -l )" -gt 0 ]; then 
             log "WARN" "Apache 데몬이 root 유저 권한으로 작동중입니다."
             ((error+=1))
         fi 
-        if [ "$(grep -Ev "^[[:space:]]*#" /etc/httpd/conf/httpd.conf | grep "^[[:space:]]*Group[[:space:]]*root"  | wc -l )" -gt 0 ]; then 
+        if [ "$(grep "^[[:space:]]*Group[[:space:]]*root"  /etc/httpd/conf/httpd.conf | wc -l )" -gt 0 ]; then 
             log "WARN" "Apache 데몬이 root 그룹 권한으로 작동중입니다."
             ((error+=1))     
         fi 
@@ -1020,6 +1020,21 @@ U_36(){
     fi 
 }
 
+U_37(){
+    #/etc/httpd/conf/httpd.conf에 AllowOverride None가 하나라도 들어있으면 안됨 
+    echo "========== 웹서비스 상위 경로 이동 가능 여부 점검 ============"
+    if [ -f /etc/httpd/conf/httpd.conf ]; then   
+        if [ "$(grep "^[[:space:]]*AllowOverride[[:space:]]*None"  /etc/httpd/conf/httpd.conf | wc -l )" -gt 0 ]; then 
+            log "WARN" "U_37테스트 결과 취약 " 
+        else 
+            log "INFO" "U_37테스트 결과 안전"
+        fi 
+    else 
+        log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
+        log "NOTICE" "U_37테스트 점검불가"  
+    fi 
+
+}
 
 
 
@@ -1064,6 +1079,8 @@ U_32
 U_34
 U_35
 U_36 
+U_37 
+
 
 
 
