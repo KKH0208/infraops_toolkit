@@ -955,6 +955,33 @@ U_32(){
 
 
 
+#/etc/named.conf 파일에 allow-transfer { any; } 설정이 있으면 취약 
+U_34(){
+    echo "========== DNS Zone Transfer 점검 ============"
+    if [ "$(systemctl is-active named )" = "inactive" ]; then 
+            log "INFO" "DNS 서비스 사용중이 아닙니다."
+            log "INFO" "U_34테스트 결과 안전"
+    else 
+        if [ -f /etc/named.conf ]; then 
+            if [ $(grep -vE "^[[:space:]]*#" /etc/named.conf | grep -i "allow-transfer"  | grep -i "any" | wc -l) -gt 0 ]; then 
+                log "WARN" "Zone Transfer를 모든 사용자에게 허용중입니다."
+                log "WARN" "U_34테스트 결과 취약 "
+            else 
+                log "INFO" "Zone Transfer를 허가된 사용자에게만 허용중입니다."
+                log "INFO" "U_34테스트 결과 안전"
+    
+            fi 
+
+        else 
+            log "NOTICE" "/etc/named.conf 설정파일이 존재하지 않습니다."
+            log "NOTICE" "U_34테스트 점검불가" 
+        fi 
+    fi 
+
+}
+
+
+
 #========== 메인 ============
 
 #이거도 반복문으로 돌려도 될듯? 
@@ -992,6 +1019,8 @@ U_29
 #U_30 최신버전 확인이 빡센데
 U_31
 U_32
+#U_33 이거도 최신버전 
+U_34
 
 
 
