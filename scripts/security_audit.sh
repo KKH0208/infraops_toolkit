@@ -1079,13 +1079,13 @@ U_39(){
 
 
 
-
+#LimitRequestBody가 설정되어 있는지, 있다면 모든 디렉토리에 대해 설정용량을 보고 제일 큰게 5메가 이상인지 확인 
 U_40(){
     echo "========== 웹서비스 파일 업로드 및 다운로드 제한 ============"
     if [ -f /etc/httpd/conf/httpd.conf ]; then  
         if [ "$(grep -i "^[^#]*LimitRequestBody" /etc/httpd/conf/httpd.conf | wc -l )" -gt 0 ]; then 
-            if [ "$(grep -i "^[^#]*LimitRequestBody" /etc/httpd/conf/httpd.conf | awk '{print $2}')" -gt 5000000 ]; then 
-                log "NOTICE" "업로드 및 다운로드 파일이 5M 초과로 설정되어 있습니다."
+            if [ "$(grep -i "^[^#]*LimitRequestBody" /etc/httpd/conf/httpd.conf | awk '{print $2}') | sort -nr | head -n 1)" -gt 5000000 ]; then 
+                log "NOTICE" "업로드 및 다운로드 파일이 5M 초과로 설정되어 있는 디렉토리가 존재합니다."
                 log "NOTICE" "U_40테스트 결과 주의"
             else 
                 log "INFO" "U_40테스트 결과 안전"
