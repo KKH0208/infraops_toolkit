@@ -1102,6 +1102,28 @@ U_40(){
     
 }
 
+
+U_41(){
+    echo "========== 웹서비스 영역의 분리 ============"
+    if [ -f /etc/httpd/conf/httpd.conf ]; then  
+        if [ "$(grep -i "^[^#]*DocumentRoot" /etc/httpd/conf/httpd.conf | wc -l )" -gt 0 ]; then 
+            document_root="$(grep -i "^[^#]*DocumentRoot" /etc/httpd/conf/httpd.conf | awk '{print $2}' | head -n 1)"
+            if [ "$document_root" = "/usr/local/apache/htdocs" ] || [ "$document_root" = "/usr/local/apache2/htdocs" ] || [ "$document_root" = "/var/www/html" ]; then 
+                log "WARN" "DocumentRoot가 기본 디렉토리로 설정되어 있습니다."
+                log "WARN" "U_41테스트 결과 취약 "
+            else 
+                log "INFO" "U_41테스트 결과 안전"
+            fi 
+        else
+            log "WARN" "DocumentRoot가 설정되어 있지 않습니다."
+            log "WARN" "U_41테스트 결과 취약"
+        fi 
+    else 
+        log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
+        log "NOTICE" "U_41테스트 점검불가"  
+    fi 
+
+}
 #========== 메인 ============
 
 #이거도 반복문으로 돌려도 될듯? 
@@ -1147,6 +1169,8 @@ U_37
 U_38 
 U_39
 U_40
+U_41
+
 
 
 
