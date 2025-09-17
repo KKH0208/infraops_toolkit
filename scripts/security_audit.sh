@@ -1037,6 +1037,28 @@ U_37(){
 }
 
 
+# /usr/share/httpd/htdocs/manual 랑 /usr/share/httpd/manual 두 디렉터리 중 하나라도 존재하면 취약으로 하면 될듯 
+U_38(){
+    echo "========== 웹서비스 불필요한 파일 존재 여부 점검 ============"
+    error=0
+
+    if [ -d /usr/share/httpd/htdocs/manual ]; then 
+        log "WARN" "/usr/share/httpd/htdocs/manual 디렉터리가 존재합니다."
+        ((error+=1))
+    fi 
+    if [ -d /usr/share/httpd/manual ]; then 
+        log "WARN" "/usr/share/httpd/manual 디렉터리가 존재합니다."
+        ((error+=1))
+    fi     
+    if [ $error -gt 0 ]; then 
+        log "WARN" "U_38테스트 결과 취약 " 
+    else 
+        log "INFO" "U_38테스트 결과 안전"
+    fi
+    
+}
+
+
 
 #========== 메인 ============
 
@@ -1080,6 +1102,8 @@ U_34
 U_35
 U_36 
 U_37 
+U_38 
+
 
 
 
