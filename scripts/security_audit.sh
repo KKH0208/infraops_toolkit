@@ -1102,12 +1102,12 @@ U_40(){
     
 }
 
-
+awk '{gsub(/"/,"",$2); print $2}'
 U_41(){
     echo "========== 웹서비스 영역의 분리 ============"
     if [ -f /etc/httpd/conf/httpd.conf ]; then  
         if [ "$(grep -i "^[^#]*DocumentRoot" /etc/httpd/conf/httpd.conf | wc -l )" -gt 0 ]; then 
-            document_root="$(grep -i "^[^#]*DocumentRoot" /etc/httpd/conf/httpd.conf | awk '{print $2}' | head -n 1)"
+            document_root="$(grep -i "^[^#]*DocumentRoot" /etc/httpd/conf/httpd.conf | awk '{gsub(/"/,"",$2); print $2}' | head -n 1)"
             if [ "$document_root" = "/usr/local/apache/htdocs" ] || [ "$document_root" = "/usr/local/apache2/htdocs" ] || [ "$document_root" = "/var/www/html" ]; then 
                 log "WARN" "DocumentRoot가 기본 디렉토리로 설정되어 있습니다."
                 log "WARN" "U_41테스트 결과 취약 "
