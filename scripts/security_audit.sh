@@ -1102,7 +1102,7 @@ U_40(){
     
 }
 
-awk '{gsub(/"/,"",$2); print $2}'
+
 U_41(){
     echo "========== 웹서비스 영역의 분리 ============"
     if [ -f /etc/httpd/conf/httpd.conf ]; then  
