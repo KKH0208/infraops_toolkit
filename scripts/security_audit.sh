@@ -1059,6 +1059,22 @@ U_38(){
 }
 
 
+U_39(){
+    echo "========== 웹서비스 링크 사용금지 점검 ============"
+    if [ -f /etc/httpd/conf/httpd.conf ]; then  
+
+        if [ "$(grep -i "^[[:space:]]*[^#]*Options[^#]*FollowSymLinks" /etc/httpd/conf/httpd.conf | wc -l)" -gt 0 ] &&
+            [ "$(grep -i "^[[:space:]]*[^#]*Options[^#]*-FollowSymLinks" /etc/httpd/conf/httpd.conf | wc -l)" -eq 0 ] ; then 
+            log "WARN" "심볼릭 링크, aliases가 사용 가능한 상태입니다."
+            log "WARN" "U_39테스트 결과 취약 "
+        else
+            log "INFO" "U_39테스트 결과 안전"
+        fi
+    else 
+        log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
+        log "NOTICE" "U_39테스트 점검불가"  
+    fi 
+}
 
 #========== 메인 ============
 
@@ -1103,6 +1119,7 @@ U_35
 U_36 
 U_37 
 U_38 
+U_39
 
 
 
