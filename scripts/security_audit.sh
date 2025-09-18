@@ -7,6 +7,20 @@ CONFIG_FILE="$SCRIPT_DIR"/config/slack.conf
 TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 LOG_FILE=$SCRIPT_DIR/reports/audit_$TIMESTAMP.log
 
+pass_cnt=0
+fail_cnt=0
+na_cnt=0
+
+error_code=0
+error_code_array=(0 0 0 0 0 0) # U_02,U_10 << 얘네들은 에러코드 테이블도 나중에 만들어야 함.
+
+#U_13에서 무슨 파일에 SUID,SGID설정되어 있는지 알 수 있게 뭐 해야할듯 
+#U_14도 에러코드 설정해야함
+#U_16 major, minor number를 가지지 않는 device일 경우 삭제이거 로직을 추가해야 할듯
+#U_17은 뭐냐 확인해
+passed_items=()
+failed_items=()
+na_items=()
 
 #========== 함수 ============
 
@@ -52,14 +66,15 @@ audit_server(){
 check_password_quality(){
     local key=$1 
     local min=$2
+    local index=$3
     local value=$(grep -E "^[[:space:]]*$1[[:space:]]*=" "$file" | awk -F'=' '{gsub(/ /,"",$2); print $2}')
 
     if grep -qE "^[[:space:]]*$1[[:space:]]*=" "$file" ; then 
             if [ -n $value ] && [ $value -ge $min ]; then 
                 log "INFO" "$key 설정 통과"
-                ((password_test+=1))
             else
                 log "WARN" "$key 설정 부족"
+                error_code_array[$index]=1
         fi 
     else 
         log "WARN" "${key}이 설정되지 않았습니다"
@@ -68,64 +83,91 @@ check_password_quality(){
 }
 
 
-U_01(){
-    local only_tty_root_login=0
-    local ssh_warn=0
+U_00(){
 
+    
     echo "========== pts로그인 설정 확인 ============"
 
     if [ -f /etc/pam.d/login ]; then 
-        if grep -E "^\s*auth\s+required\s+/lib/security/pam_securetty.so" /etc/pam.d/login; then 
+        if grep -Eq "^\s*auth\s+required\s+/lib/security/pam_securetty.so" /etc/pam.d/login; then 
             if [ -f /etc/securetty ]; then 
-                if grep "pty" /etc/securetty; then 
+                if grep -Eq "^[[:space:]]*[^#]*pty" /etc/securetty; then 
                     log "WARN" "pty로 루트 로그인이 가능한 상태입니다."
+                    error_code=1
                 else 
                     log "INFO" "tty로만 root로그인이 가능합니다"
-                    ((only_tty_root_login+=1))
+                    error_code=0
                 fi
             else    
-                log "WARN" "/etc/securetty파일이 존재하지 않습니다"
+                log "NOTICE" "/etc/securetty파일이 존재하지 않습니다"
+                error_code=10
             fi 
         else
             log "WARN" "auth required /lib/security/pam_securetty.so이 포함되어 있지 않습니다."
+            error_code=2
         fi
     else 
-        log "WARN" "/etc/pam.d/login 파일이 없습니다"
+        log "NOTICE" "/etc/pam.d/login 파일이 없습니다"
+        error_code=11
     fi 
 
+    if [ $error_code -eq 0 ]; then 
+        log "INFO" "U_00테스트 결과 안전"
+        ((pass_cnt+=1))
+    elif [ $error_code -gt 0 ] && [ $error_code -lt 10 ]; then 
+        log "WARN" "U_00테스트 결과 취약"
+        ((fail_cnt+=1))
+    else 
+        log "NOTICE" "U_00테스트 결과 경고"
+        ((na_cnt+=1))
+    fi 
+
+}
+
+
+
+# 이러면 두개 다 문제 있으면 하나만 조치가 뜨긴 하네 둘 다 뜨게 고치긴 해야할듯 
+U_01(){
+    
     echo "========== ssh 설정 확인 ============"
     if [ -f /etc/ssh/sshd_config ]; then 
         if sudo grep -qE "^[[:space:]]*passwordAuthentication[[:space:]]+yes" /etc/ssh/sshd_config; then 
             log "WARN" "passwordAuthentication yes 발견"
-            ((ssh_warn +=1))
+            error_code=1
         else
             log "INFO" "원격 비밀번호 로그인 불가능 설정 확인"
         fi 
 
         if sudo grep -qE "^[[:space:]]*PermitRootLogin[[:space:]]+yes" /etc/ssh/sshd_config; then 
             log "WARN" "PermitRootLogin yes 발견"
-            ((ssh_warn +=1))
+            error_code=2
+
         else
             log "INFO" "원격 루트 로그인 불가능 설정 확인"
         fi  
     else
-        log "WARN" "ssh설정파일이 없습니다. ssh 설치 여부를 확인해주세요"
-        ((ssh_warn +=1))
+        log "NOTICE" "ssh설정파일이 없습니다. ssh 설치 여부를 확인해주세요"
+        error_code=10
     fi 
 
 
-    if [ $only_tty_root_login -eq 1 ] && [ $ssh_warn -eq 0 ]; then 
+    if [ $error_code -eq 0 ]; then 
         log "INFO" "U_01테스트 결과 안전"
-    else
+        ((pass_cnt+=1))
+    elif [ $error_code -gt 0 ] && [ $error_code -lt 10 ]; then 
         log "WARN" "U_01테스트 결과 취약"
-    fi
-    
+        ((fail_cnt+=1))
+    else 
+        log "NOTICE" "U_01테스트 결과 경고"
+        ((na_cnt+=1))    
+    fi 
+
 }
 
 
 
-password_test=0
 
+# 얘는 에러코드가 배열이니까 처리가 어렵긴 하구만
 U_02(){
     echo "========== 패스워드 복잡성 설정 ============"
     local lcredit=1 #소문자 최소 1자 이상 요구
@@ -136,48 +178,65 @@ U_02(){
     local file="/etc/security/pwquality.conf"
 
     if [ -f "$file" ]; then 
-        check_password_quality "lcredit" "$lcredit"
-        check_password_quality "ucredit" "$ucredit"
-        check_password_quality "dcredit" "$dcredit"
-        check_password_quality "ocredit" "$ocredit"
-        check_password_quality "minlen" "$minlen"
+        check_password_quality "lcredit" "$lcredit" "0"
+        check_password_quality "ucredit" "$ucredit" "1"
+        check_password_quality "dcredit" "$dcredit" "2"
+        check_password_quality "ocredit" "$ocredit" "3"
+        check_password_quality "minlen" "$minlen" "4"
     else 
         log "WARN" "pwquality.conf 파일이 없습니다."
+        error_code=10
     fi
 
-    if [ $password_test -eq 5 ]; then 
+    if [ $error_code -eq 0 ]; then 
         log "INFO" "U_02테스트 결과 안전"
-    else
+        ((pass_cnt+=1))
+    elif [ $error_code -eq 10 ]; then 
+        log "NOTICE" "U_02테스트 결과 경고"
+        ((na_cnt+=1)) 
+    else 
         log "WARN" "U_02테스트 결과 취약"
+        ((fail_cnt+=1))
     fi        
+
 }
+
+
 
 U_03(){
     #계정 잠금 임계값이 10회 이하의 값으로 설정되어 있으면 통과
     file="/etc/pam.d/system-auth"
-    U_03_result=0
+
     echo "========== 계정 잠금 임계값 설정 ============"
     if [ -f $file ]; then 
         if sudo grep -qE "^\s*auth\s+required\s+/lib/security/pam_tally.so" "$file"; then 
             value=$(sudo grep "/lib/security/pam_tally.so" "$file" | grep -oP 'deny\s*=\s*\K[0-9]+')
             if [[ "$value" =~ ^[0-9]+$  ]] && [ $value -le 10 ]; then 
                 log "INFO" "계정 잠금 임계값 결과 양호"
-                $U_03_result=1
             else
                 log "WARN" "deny설정이 없거나 10회 이상입니다"
+                error_code=1
             fi 
         else 
             log "WARN" "pam_tally.so모듈을 사용하고 있지 않습니다"
+            error_code=2
+
         fi
     else 
-        log "WARN" "/etc/pam.d/system-auth 파일을 찾을 수 없습니다"
+        log "NOTICE" "/etc/pam.d/system-auth 파일을 찾을 수 없습니다"
+        error_code=10
     fi
 
-    if [ $U_03_result -eq 1 ]; then 
+    if [ $error_code -eq 0 ]; then 
         log "INFO" "U_03테스트 결과 안전"
-    else
+        ((pass_cnt+=1))
+    elif [ $error_code -gt 0 ] && [ $error_code -lt 10 ]; then 
         log "WARN" "U_03테스트 결과 취약"
-    fi  
+        ((fail_cnt+=1))
+    else 
+        log "NOTICE" "U_03테스트 결과 경고"
+        ((na_cnt+=1))    
+    fi 
 
 }
 
@@ -186,9 +245,12 @@ U_04(){
     if [ $(awk -F':' '$2 != "x"' /etc/passwd | wc -l) -gt 0 ]; then 
         log "WARN" "섀도 패스워드가 설정되어 있지 않습니다"
         log "WARN" "U_04테스트 결과 취약"
-
+        error_code=1
+        ((fail_cnt+=1))
+        
     else
         log "INFO" "U_04테스트 결과 안전"
+        ((pass_cnt+=1))
     fi 
 }
 
@@ -198,12 +260,18 @@ U_05(){
     warning=$(echo $PATH | grep -E "\.:|::" | wc -l )
     if [ $warning -gt 0 ]; then 
         log "WARN" "환경변수 경로에 '.:' 혹은 '::'이 포함되어 있습니다"
+        error_code=1
+        ((fail_cnt+=1))
         log "WARN" "U_05테스트 결과 취약"
 
     else
         log "INRO" "환경변수 경로 검사 결과 양호"
         log "INFO" "U_05테스트 결과 안전"
+        ((pass_cnt+=1))
     fi 
+
+    error_code_array=(0 0 0 0 0)
+
 }
 
 U_06(){
@@ -216,17 +284,24 @@ U_06(){
     if [ $nouser_file_num -gt 0 ] && [ $nogroup_file_num -gt 0 ]; then 
         log "WARN" "/etc/passwd에 등록되지 않은 유저와 그룹 소유의 파일 혹은 디렉토리가 존재합니다"
         log "WARN" "U_06테스트 결과 취약"
+        error_code=1
+        ((fail_cnt+=1))
 
     elif [ $nouser_file_num -gt 0 ]; then 
         log "WARN" "/etc/passwd에 등록되지 않은 유저 소유의 파일 혹은 디렉토리가 존재합니다"
         log "WARN" "U_06테스트 결과 취약"
+        error_code=2
+        ((fail_cnt+=1))
     
     elif  [ $nogroup_file_num -gt 0 ]; then 
         log "WARN" "/etc/passwd에 등록되지 않은 그룹 소유의 파일 혹은 디렉토리가 존재합니다"
         log "WARN" "U_06테스트 결과 취약"
+        error_code=3
+        ((fail_cnt+=1))
     else
         log "INRO" "파일 및 디렉토리 소유자 점검 결과 양호"
         log "INFO" "U_06테스트 결과 안전"
+        ((pass_cnt+=1))
     fi 
 
 }   
@@ -240,22 +315,29 @@ U_07(){
         if [ $check -eq 1 ]; then 
             log "WARN" "/etc/passwd파일의 권한이 큽니다"
             log "WARN" "U_07테스트 결과 취약" 
+            ((fail_cnt+=1))
+            error_code=1
         else
             user=$(ls -l /etc/passwd | awk '{print $3}')
             group=$(ls -l /etc/passwd | awk '{print $4}')
 
             if [ $user = "root" ] && [ $group = "root" ]; then 
                 log "INFO" "U_07테스트 결과 안전"
+                ((pass_cnt+=1))
             else
                 log "WARN" "/etc/passwd파일의 소유자가 root가 아닙니다"
-                log "WARN" "U_07테스트 결과 취약"           
+                log "WARN" "U_07테스트 결과 취약"  
+                ((fail_cnt+=1))
+                error_code=2                     
             fi
 
         fi
 
     else 
-        log "WARN" "/etc/passwd파일이 존재하지 않습니다"
-        log "WARN" "U_07테스트 결과 취약"
+        log "NOTICE" "/etc/passwd파일이 존재하지 않습니다"
+        log "NOTICE" "U_07테스트 결과 경고"
+        ((na_cnt+=1))    
+        error_code=10                
     fi
 
 }
@@ -270,6 +352,9 @@ U_08(){
         if [ $check_000 -eq 0 ] && [ $check_400 -eq 0 ]; then 
             log "WARN" "/etc/passwd파일의 권한이 큽니다"
             log "WARN" "U_08테스트 결과 취약" 
+            ((fail_cnt+=1))
+            error_code=1
+
 
         else
             user=$(ls -l /etc/shadow | awk '{print $3}')
@@ -277,17 +362,22 @@ U_08(){
 
             if [ $user = "root" ] && [ $group = "root" ]; then 
                 log "INFO" "U_08테스트 결과 안전"
+                ((pass_cnt+=1))
             else
                 log "WARN" "/etc/shadow파일의 소유자가 root가 아닙니다"
-                log "WARN" "U_08테스트 결과 취약"           
+                log "WARN" "U_08테스트 결과 취약"   
+                ((fail_cnt+=1))
+                error_code=2                        
             fi 
 
             
 
         fi
     else 
-        log "WARN" "/etc/shadow파일이 존재하지 않습니다"
-        log "WARN" "U_08테스트 결과 취약"
+        log "NOTICE" "/etc/shadow파일이 존재하지 않습니다"
+        log "NOTICE" "U_08테스트 결과 취약"
+        ((na_cnt+=1))    
+        error_code=10  
     fi
 
 }
@@ -299,22 +389,29 @@ U_09(){
         if [ $check -eq 1 ]; then 
             log "WARN" "/etc/hosts 파일의 권한이 큽니다"
             log "WARN" "U_09테스트 결과 취약" 
+            ((fail_cnt+=1))
+            error_code=1
         else
             user=$(ls -l /etc/hosts | awk '{print $3}')
             group=$(ls -l /etc/hosts | awk '{print $4}')
 
             if [ $user = "root" ] && [ $group = "root" ]; then 
                 log "INFO" "U_09테스트 결과 안전"
+                ((pass_cnt+=1))
             else
                 log "WARN" "/etc/hosts파일의 소유자가 root가 아닙니다"
-                log "WARN" "U_09테스트 결과 취약"           
+                log "WARN" "U_09테스트 결과 취약"  
+                ((fail_cnt+=1))
+                error_code=2            
             fi
 
         fi
 
     else 
-        log "WARN" "/etc/hosts파일이 존재하지 않습니다"
-        log "WARN" "U_09테스트 결과 취약"
+        log "NOTICE" "/etc/hosts파일이 존재하지 않습니다"
+        log "NOTICE" "U_09테스트 결과 취약"
+        ((na_cnt+=1))    
+        error_code=10 
     fi   
 }
 
@@ -340,13 +437,17 @@ U_10(){
                 ((xinetd_conf+=1))
             else
                 log "WARN" "/etc/xinetd.conf 파일의 소유자가 root가 아닙니다"
+                error_code_array[0]=1
             fi 
         else 
             log "WARN" "/etc/xinetd.conf 파일의 권한이 너무 큽니다"
+            error_code_array[1]=1
+
         fi 
 
     else 
-        log "WARN" "/etc/xinetd.conf파일이 존재하지 않습니다"
+        log "NOTICE" "/etc/xinetd.conf파일이 존재하지 않습니다"
+        error_code_array[4]=1
     fi 
 
     if [ -d /etc/xinetd.d ]; then 
@@ -355,6 +456,7 @@ U_10(){
             check=$(find "$file" -type f -perm 600 | wc -l)
             if [ $check -ne 1 ]; then 
                 log "WARN" "${file}의 파일 권한이 너무 큽니다"
+                error_code_array[2]=1
                 ((xinetd_d-=1))
                 break
             else
@@ -362,6 +464,7 @@ U_10(){
                 group=$(ls -l "$file" | awk '{print $4}')
                 if [ $user != "root" ] || [ $group != "root" ]; then 
                     log "WARN" "/etc/xinetd.conf 파일의 소유자가 root가 아닙니다"
+                    error_code_array[3]=1
                     ((xinetd_d-=1))
                     break
 
@@ -371,40 +474,55 @@ U_10(){
         
 
     else 
-        log "WARN" "/etc/xinetd.d 디렉토리가 존재하지 않습니다"
+        log "NOTICE" "/etc/xinetd.d 디렉토리가 존재하지 않습니다"    
+        error_code_array[5]=1
+
     fi 
 
     if [ $xinetd_conf -eq 1 ] && [ $xinetd_d -eq 0 ]; then 
         log "INFO" "U_10테스트 결과 안전"
+        ((pass_cnt+=1))
+    elif [ "${error_code_array[4]}" -eq 1 ] || [ "${error_code_array[5]}" -eq 1 ]; then 
+        log "NOTICE" "U_10테스트 결과 경고"
+        ((na_cnt+=1))
     else
         log "WARN" "U_10테스트 결과 취약"
+        ((fail_cnt+=1))
     fi 
 }
 
 U_11(){
     echo "========== rsyslog.conf 파일 권한 점검 ============"
-    #“syslog.conf” 파일의 소유자가 root가 아니거나 파일의 권한이 640이하인 경우 아래의 보안설정방법에 따라 설정을 변경함
+    #“rsyslog.conf” 파일의 소유자가 root가 아니거나 파일의 권한이 640이하인 경우 아래의 보안설정방법에 따라 설정을 변경함
     
     if [ -f /etc/rsyslog.conf ]; then 
         check=$(find /etc/rsyslog.conf -type f -perm /0137 | wc -l)
         if [ $check -eq 1 ]; then 
             log "WARN" "/etc/rsyslog.conf 파일의 권한이 큽니다"
             log "WARN" "U_11테스트 결과 취약"
+            ((fail_cnt+=1))
+            error_code=1
+
         else 
             user=$(ls -l /etc/rsyslog.conf | awk '{print $3}')
             group=$(ls -l /etc/rsyslog.conf | awk '{print $4}')
             if [ $user != "root" ] || [ $group != "root" ]; then 
                 log "WARN" "/etc/rsyslog.conf 파일의 소유자가 root가 아닙니다"
                 log "WARN" "U_11테스트 결과 취약"
+                ((fail_cnt+=1))
+                error_code=2
             else 
                 log "INFO" "U_11테스트 결과 안전"
+                ((pass_cnt+=1))
             fi 
         fi 
 
             
 
     else 
-        log "WARN" "/etc/rsyslog.conf 파일이 존재하지 않습니다"
+        log "NOTICE" "/etc/rsyslog.conf 파일이 존재하지 않습니다"
+        ((na_cnt+=1))
+        error_code=10
     fi 
 }
 
@@ -417,21 +535,28 @@ U_12(){
         if [ $check -eq 1 ]; then 
             log "WARN" "/etc/services 파일의 권한이 큽니다"
             log "WARN" "U_12테스트 결과 취약"
+            ((fail_cnt+=1))
+            error_code=1
         else 
             user=$(ls -l /etc/services | awk '{print $3}')
             group=$(ls -l /etc/services | awk '{print $4}')
             if [ $user != "root" ] || [ $group != "root" ]; then 
                 log "WARN" "/etc/services 파일의 소유자가 root가 아닙니다"
                 log "WARN" "U_12테스트 결과 취약"
+                ((fail_cnt+=1))
+                error_code=2
             else 
                 log "INFO" "U_12테스트 결과 안전"
+                ((pass_cnt+=1))
             fi 
         fi 
 
             
 
     else 
-        log "WARN" "/etc/services 파일이 존재하지 않습니다"
+        log "NOTICE" "/etc/services 파일이 존재하지 않습니다"
+        ((na_cnt+=1))
+        error_code=10
     fi 
 }
 
@@ -463,7 +588,7 @@ U_13(){
 
     for file in "${check_files[@]}"; do 
         if [ ! -f $file ]; then 
-            log "WARN" "$file 파일이 존재하지 않습니다."
+            log "NOTICE" "$file 파일이 존재하지 않습니다."
         else 
             if ls -alL $file | awk '{print $1}' | grep -Eq '[sS]|[gG]'; then 
                 warning_files+=("$file") 
@@ -478,8 +603,12 @@ U_13(){
         done 
 
         log "WARN" "U_13테스트 결과 취약"
+        ((fail_cnt+=1))
+        error_code=1
     else 
         log "INFO" "U_13테스트 결과 안전"
+        ((pass_cnt+=1))
+
     fi 
 
 }
@@ -488,7 +617,7 @@ U_13(){
 U_14(){
     echo "========== 사용자 환경파일 소유자 및 권한 점검 ============"
 
-    error=0
+    
     env_files=(
     ".profile"
     ".kshrc"
@@ -499,14 +628,14 @@ U_14(){
     ".exrc"
     ".netrc"
     )
-
+    error=0
     warning_files=()
     users=($(ls /home))
 
     for user in "${users[@]}"; do 
         for file in "${env_files[@]}"; do 
             if [ ! -f /home/"$user"/"$file" ]; then 
-                log "INFO" "/home/"$user"/"$file" 환경파일이 존재하지 않습니다"
+                log "NOTICE" "/home/"$user"/"$file" 환경파일이 존재하지 않습니다"
                 continue
             fi 
 
@@ -528,8 +657,11 @@ U_14(){
 
     if [ $error -eq 0 ]; then 
         log "INFO" "U_14테스트 결과 안전"
+        ((pass_cnt+=1))
     else 
         log "WARN" "U_14테스트 결과 취약"
+        ((fail_cnt+=1))
+
     fi 
 
     
@@ -544,9 +676,12 @@ U_15(){
     ww_files=$(find / -path /proc -prune -o -path /sys -prune -o -path /dev -prune -o -type f -perm -2 2>/dev/null)
     if [ -n "$ww_files" ]; then 
         log "INFO" "U_15테스트 결과 안전"
+        ((pass_cnt+=1))
     else 
         echo "발견된 world writable 파일: $ww_files"
         log "WARN" "U_15테스트 결과 취약"
+        ((fail_cnt+=1))
+        error_code=1
 
     fi
 }
@@ -555,8 +690,11 @@ U_16(){
     echo "========== /dev에 존재하지 않는 device 파일 점검 ============"
     if [ $(find /dev -type f -exec ls -l {} \; | wc -l ) -eq 0 ]; then 
         log "INFO" "U_16테스트 결과 안전"
+        ((pass_cnt+=1))
     else 
         log "WARN" "U_16테스트 결과 취약"
+        ((fail_cnt+=1))
+        error_code=1
     fi 
 
 }
@@ -571,24 +709,32 @@ U_18(){
                 if grep -Eiq '^\s*ALL\s*:\s*ALL\s*$' /etc/host.allow; then 
                     log "WARN" "/etc/hosts.allow 파일에 ALL:ALL 설정이 있습니다."
                     log "WARN" "U_18테스트 결과 취약"
+                    ((fail_cnt+=1))
+                    error_code=1
                     break                    
                 else 
                     log "INFO" "U_18테스트 결과 안전" 
+                    ((pass_cnt+=1))
                     break
                 fi
             else 
-            log "INFO" "/etc/hosts.allow 파일이 없습니다"
-            log "INFO" "U_18테스트 결과 안전" # /etc/hosts.allow은 없어도 괜찮음.
+                log "INFO" "/etc/hosts.allow 파일이 없습니다"
+                log "INFO" "U_18테스트 결과 안전" # /etc/hosts.allow은 없어도 괜찮음.
+                ((pass_cnt+=1))
             fi
         else 
             log "WARN" "/etc/hosts.deny 파일에 ALL:ALL 설정이 없습니다."
             log "WARN" "U_18테스트 결과 취약"
+            ((fail_cnt+=1))
+            error_code=2
             break
         fi
 
     else 
-        log "WARN" "/etc/hosts.deny 파일이 없습니다."
-        log "WARN" "tcp_wrappers를 사용중이라면 U_18테스트 결과 취약 "
+        log "NOTICE" "/etc/hosts.deny 파일이 없습니다."
+        log "NOTICE" "tcp_wrappers를 사용중이라면 U_18테스트 결과 취약 "
+        ((na_cnt+=1))
+        error_code=10
     fi 
 }
 
@@ -598,8 +744,12 @@ U_19(){
     if ls -alL /etc/xinetd.d/* 2>/dev/null | grep -Eiq "echo finger" ; then
         log "WARN" "finger서비스가 활성화 중입니다. "
         log "WARN" "U_19테스트 결과 취약"
+        ((fail_cnt+=1))
+        error_code=1
     else 
         log "INFO" "U_19테스트 결과 안전" # 단, xinetd를 사용할 경우
+        ((pass_cnt+=1))
+
     fi
 }
 
@@ -608,8 +758,12 @@ U_20(){
     if cat /etc/passwd | grep -q "ftp"; then 
         log "WARN" "FTP계정이 존재합니다"
         log "WARN" "U_20테스트 결과 취약"
+        ((fail_cnt+=1))
+        error_code=1
     else 
         log "INFO" "U_20테스트 결과 안전"
+        ((pass_cnt+=1))
+
     fi 
 
 }
@@ -1129,6 +1283,7 @@ U_41(){
 #이거도 반복문으로 돌려도 될듯? 
 
 load_config
+U_00
 U_01
 U_02
 U_03
@@ -1174,17 +1329,6 @@ U_41
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 #==========공부노트 ============
 # /etc/pam.d/login에 보면 무슨 모듈을 쓸지 나오는데 밑에 모듈이 있어야 하고 
 # auth required /lib/security/pam_securetty.so
@@ -1217,3 +1361,6 @@ U_41
 #systemctl list-units --type=service --all | grep -Eq  "ypserv|ypbind|ypxfrd|rpc.yppasswdd|rpc.ypupdated
 # -> 이건 저 서비스들이 깔려 있으면 출력됨
 # systemctl is-active ypserv 이러면 활성화 여부 확인가능 active 뜨면 실행중. 
+
+
+
