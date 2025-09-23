@@ -71,7 +71,7 @@ create_vuln_action_plan(){
         write_md "## $item "
         write_md "- 상황: $desc"
         write_md "- 조치: $action"
-
+    done 
 
 }
 
