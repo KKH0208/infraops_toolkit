@@ -7,7 +7,7 @@ TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 report="report_${TIMESTAMP}.md"
 source ./security_audit.sh
 csv_file="../config/data_for_report.csv"
-
+json_file="../config/error_code_table.json"
 
 #========== 함수 ============
 
@@ -61,6 +61,16 @@ create_audit_result_detail(){
 
 create_vuln_action_plan(){
     write_md "## 4. 취약 항목 요약 및 조치"
+    
+    for idx in "${!failed_items[@]}";do
+        
+        item=${failed_items[$i]}
+        subkey=${error_code_list[$i]}
+        desc=$(jq -r --arg k "$key" --arg sk "$subkey" '.[$k][$sk].desc' "$json_file")
+        action=$(jq -r --arg k "$key" --arg sk "$subkey" '.[$k][$sk].action // ""' "$json_file")
+        write_md "## $item "
+        write_md "- 상황: $desc"
+        write_md "- 조치: $action"
 
 
 }

@@ -15,6 +15,8 @@ error_code=0
 error_code_array=(0 0 0 0 0 0 0 0 0 0 0 0) 
 warning_files=()
 audit_result=()
+error_code_list=()
+
 
 #따로 분기 필요한 애들 : 2,10,13,14,22 23 24 27 28 29 38
 #잘 모르겠는 애들 : 16 17 30 33 
@@ -1598,7 +1600,10 @@ for num in {0..38}; do
         else 
             audit_result+=("취약")
         fi 
-        
+
+        #에러코드 모아놔서 레포트 4에 쓰기 위해
+        error_code_list+=("$error_code")
+
     fi 
 done 
 
