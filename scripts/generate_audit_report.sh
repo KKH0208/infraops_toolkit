@@ -56,12 +56,6 @@ create_audit_result_detail(){
 
     done < "$file"
 
-        
-
-
-
-    done 
-
 
 }
 
