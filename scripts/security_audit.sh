@@ -1591,7 +1591,14 @@ for num in {0..38}; do
     if declare -f "$func_name" > /dev/null; then 
 
         $func_name
-        audit_result+=($error_code)
+        if [ $error_code -eq 0 ]; then 
+            audit_result+=("양호")
+        elif [ $error_code -ge 10 ]; then 
+            audit_result+=("경고")
+        else 
+            audit_result+=("취약")
+        fi 
+        
     fi 
 done 
 
