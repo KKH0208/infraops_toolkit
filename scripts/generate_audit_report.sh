@@ -5,9 +5,7 @@
 SCRIPT_DIR=$(cd "$(dirname $0)" && pwd )
 TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 report="report_${TIMESTAMP}.md"
-
-
-
+source ./security_audit.sh
 
 
 #========== 함수 ============
@@ -75,11 +73,17 @@ create_vuln_action_plan(){
 
 
 touch $report
+./security_audit.sh
+
 create_header
 create_audit_purpose
 create_audit_result_summary
 create_audit_result_detail
 create_vuln_action_plan
 
+cat $report
+echo $pass_cnt
+echo $fail_cnt
+echo $na_cnt
 
 
