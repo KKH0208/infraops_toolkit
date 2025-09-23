@@ -64,10 +64,10 @@ create_vuln_action_plan(){
     
     for idx in "${!failed_items[@]}";do
         
-        item=${failed_items[$i]}
-        subkey=${error_code_list[$i]}
-        desc=$(jq -r --arg k "$key" --arg sk "$subkey" '.[$k][$sk].desc' "$json_file")
-        action=$(jq -r --arg k "$key" --arg sk "$subkey" '.[$k][$sk].action // ""' "$json_file")
+        item=${failed_items[$idx]}
+        subkey=${error_code_list[$idx]}
+        desc=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].desc' "$json_file")
+        action=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].action // ""' "$json_file")
         write_md "## $item "
         write_md "- 상황: $desc"
         write_md "- 조치: $action"
