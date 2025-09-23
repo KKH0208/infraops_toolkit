@@ -121,12 +121,12 @@ U_00(){
 
     elif [ $error_code -gt 0 ] && [ $error_code -lt 10 ]; then 
         log "WARN" "U_00테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
     else 
         log "NOTICE" "U_00테스트 결과 경고"
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")
     fi 
 
 }
@@ -165,12 +165,12 @@ U_01(){
 
     elif [ $error_code -gt 0 ] && [ $error_code -lt 10 ]; then 
         log "WARN" "U_01테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
     else 
         log "NOTICE" "U_01테스트 결과 경고"
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))    
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")    
     fi 
 
 }
@@ -209,12 +209,12 @@ U_02(){
         
     elif [ "${error_code_array[10]}" -eq 1 ]; then 
         log "NOTICE" "U_02테스트 결과 경고"
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}"))) 
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}") 
     else 
         log "WARN" "U_02테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
     fi        
 
 }
@@ -252,12 +252,12 @@ U_03(){
 
     elif [ $error_code -gt 0 ] && [ $error_code -lt 10 ]; then 
         log "WARN" "U_03테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
     else 
         log "NOTICE" "U_03테스트 결과 경고"
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))    
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")    
     fi 
 
 }
@@ -268,8 +268,8 @@ U_04(){
         log "WARN" "섀도 패스워드가 설정되어 있지 않습니다"
         log "WARN" "U_04테스트 결과 취약"
         error_code=1
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         
     else
         log "INFO" "U_04테스트 결과 안전"
@@ -286,8 +286,8 @@ U_05(){
     if [ $warning -gt 0 ]; then 
         log "WARN" "환경변수 경로에 '.:' 혹은 '::'이 포함되어 있습니다"
         error_code=1
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         log "WARN" "U_05테스트 결과 취약"
 
     else
@@ -313,22 +313,22 @@ U_06(){
         log "WARN" "/etc/passwd에 등록되지 않은 유저와 그룹 소유의 파일 혹은 디렉토리가 존재합니다"
         log "WARN" "U_06테스트 결과 취약"
         error_code=1
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
 
     elif [ $nouser_file_num -gt 0 ]; then 
         log "WARN" "/etc/passwd에 등록되지 않은 유저 소유의 파일 혹은 디렉토리가 존재합니다"
         log "WARN" "U_06테스트 결과 취약"
         error_code=2
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
     
     elif  [ $nogroup_file_num -gt 0 ]; then 
         log "WARN" "/etc/passwd에 등록되지 않은 그룹 소유의 파일 혹은 디렉토리가 존재합니다"
         log "WARN" "U_06테스트 결과 취약"
         error_code=3
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
     else
         log "INRO" "파일 및 디렉토리 소유자 점검 결과 양호"
         log "INFO" "U_06테스트 결과 안전"
@@ -348,8 +348,8 @@ U_07(){
         if [ $check -eq 1 ]; then 
             log "WARN" "/etc/passwd파일의 권한이 큽니다"
             log "WARN" "U_07테스트 결과 취약" 
-            ((((fail_cnt+=1))
-            failed_items+=("${FUNCNAME[0]}")))
+            ((fail_cnt+=1))
+            failed_items+=("${FUNCNAME[0]}")
             error_code=1
         else
             user=$(ls -l /etc/passwd | awk '{print $3}')
@@ -363,8 +363,8 @@ U_07(){
             else
                 log "WARN" "/etc/passwd파일의 소유자가 root가 아닙니다"
                 log "WARN" "U_07테스트 결과 취약"  
-                ((((fail_cnt+=1))
-                failed_items+=("${FUNCNAME[0]}")))
+                ((fail_cnt+=1))
+                failed_items+=("${FUNCNAME[0]}")
                 error_code=2                     
             fi
 
@@ -373,8 +373,8 @@ U_07(){
     else 
         log "NOTICE" "/etc/passwd파일이 존재하지 않습니다"
         log "NOTICE" "U_07테스트 결과 경고"
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))    
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")    
         error_code=10                
     fi
 
@@ -390,8 +390,8 @@ U_08(){
         if [ $check_000 -eq 0 ] && [ $check_400 -eq 0 ]; then 
             log "WARN" "/etc/passwd파일의 권한이 큽니다"
             log "WARN" "U_08테스트 결과 취약" 
-            ((((fail_cnt+=1))
-            failed_items+=("${FUNCNAME[0]}")))
+            ((fail_cnt+=1))
+            failed_items+=("${FUNCNAME[0]}")
             error_code=1
 
 
@@ -407,8 +407,8 @@ U_08(){
             else
                 log "WARN" "/etc/shadow파일의 소유자가 root가 아닙니다"
                 log "WARN" "U_08테스트 결과 취약"   
-                ((((fail_cnt+=1))
-                failed_items+=("${FUNCNAME[0]}")))
+                ((fail_cnt+=1))
+                failed_items+=("${FUNCNAME[0]}")
                 error_code=2                        
             fi 
 
@@ -418,8 +418,8 @@ U_08(){
     else 
         log "NOTICE" "/etc/shadow파일이 존재하지 않습니다"
         log "NOTICE" "U_08테스트 결과 취약"
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))    
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")    
         error_code=10  
     fi
 
@@ -432,8 +432,8 @@ U_09(){
         if [ $check -eq 1 ]; then 
             log "WARN" "/etc/hosts 파일의 권한이 큽니다"
             log "WARN" "U_09테스트 결과 취약" 
-            ((((fail_cnt+=1))
-            failed_items+=("${FUNCNAME[0]}")))
+            ((fail_cnt+=1))
+            failed_items+=("${FUNCNAME[0]}")
             error_code=1
         else
             user=$(ls -l /etc/hosts | awk '{print $3}')
@@ -447,8 +447,8 @@ U_09(){
             else
                 log "WARN" "/etc/hosts파일의 소유자가 root가 아닙니다"
                 log "WARN" "U_09테스트 결과 취약"  
-                ((((fail_cnt+=1))
-                failed_items+=("${FUNCNAME[0]}")))
+                ((fail_cnt+=1))
+                failed_items+=("${FUNCNAME[0]}")
                 error_code=2            
             fi
 
@@ -457,8 +457,8 @@ U_09(){
     else 
         log "NOTICE" "/etc/hosts파일이 존재하지 않습니다"
         log "NOTICE" "U_09테스트 결과 취약"
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))    
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")    
         error_code=10 
     fi   
 }
@@ -535,12 +535,12 @@ U_10(){
 
     elif [ "${error_code_array[10]}" -eq 1 ] || [ "${error_code_array[11]}" -eq 1 ]; then 
         log "NOTICE" "U_10테스트 결과 경고"
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")
     else
         log "WARN" "U_10테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
     fi 
 }
 
@@ -553,8 +553,8 @@ U_11(){
         if [ $check -eq 1 ]; then 
             log "WARN" "/etc/rsyslog.conf 파일의 권한이 큽니다"
             log "WARN" "U_11테스트 결과 취약"
-            ((((fail_cnt+=1))
-            failed_items+=("${FUNCNAME[0]}")))
+            ((fail_cnt+=1))
+            failed_items+=("${FUNCNAME[0]}")
             error_code=1
 
         else 
@@ -563,8 +563,8 @@ U_11(){
             if [ $user != "root" ] || [ $group != "root" ]; then 
                 log "WARN" "/etc/rsyslog.conf 파일의 소유자가 root가 아닙니다"
                 log "WARN" "U_11테스트 결과 취약"
-                ((((fail_cnt+=1))
-                failed_items+=("${FUNCNAME[0]}")))
+                ((fail_cnt+=1))
+                failed_items+=("${FUNCNAME[0]}")
                 error_code=2
             else 
                 log "INFO" "U_11테스트 결과 안전"
@@ -578,8 +578,8 @@ U_11(){
 
     else 
         log "NOTICE" "/etc/rsyslog.conf 파일이 존재하지 않습니다"
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")
         error_code=10
     fi 
 }
@@ -593,8 +593,8 @@ U_12(){
         if [ $check -eq 1 ]; then 
             log "WARN" "/etc/services 파일의 권한이 큽니다"
             log "WARN" "U_12테스트 결과 취약"
-            ((((fail_cnt+=1))
-            failed_items+=("${FUNCNAME[0]}")))
+            ((fail_cnt+=1))
+            failed_items+=("${FUNCNAME[0]}")
             error_code=1
         else 
             user=$(ls -l /etc/services | awk '{print $3}')
@@ -602,8 +602,8 @@ U_12(){
             if [ $user != "root" ] || [ $group != "root" ]; then 
                 log "WARN" "/etc/services 파일의 소유자가 root가 아닙니다"
                 log "WARN" "U_12테스트 결과 취약"
-                ((((fail_cnt+=1))
-                failed_items+=("${FUNCNAME[0]}")))
+                ((fail_cnt+=1))
+                failed_items+=("${FUNCNAME[0]}")
                 error_code=2
             else 
                 log "INFO" "U_12테스트 결과 안전"
@@ -617,8 +617,8 @@ U_12(){
 
     else 
         log "NOTICE" "/etc/services 파일이 존재하지 않습니다"
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")
         error_code=10
     fi 
 }
@@ -667,8 +667,8 @@ U_13(){
         done 
 
         log "WARN" "U_13테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else 
         log "INFO" "U_13테스트 결과 안전"
@@ -732,8 +732,8 @@ U_14(){
         error_code=0
     else 
         log "WARN" "U_14테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         error_code=1
 
     fi 
@@ -756,8 +756,8 @@ U_15(){
     else 
         echo "발견된 world writable 파일: $ww_files"
         log "WARN" "U_15테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         error_code=1
 
     fi
@@ -772,8 +772,8 @@ U_16(){
 
     else 
         log "WARN" "U_16테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         error_code=1
     fi 
 
@@ -789,8 +789,8 @@ U_18(){
                 if grep -Eiq '^\s*ALL\s*:\s*ALL\s*$' /etc/host.allow; then 
                     log "WARN" "/etc/hosts.allow 파일에 ALL:ALL 설정이 있습니다."
                     log "WARN" "U_18테스트 결과 취약"
-                    ((((fail_cnt+=1))
-                    failed_items+=("${FUNCNAME[0]}")))
+                    ((fail_cnt+=1))
+                    failed_items+=("${FUNCNAME[0]}")
                     error_code=1
                     break                    
                 else 
@@ -810,8 +810,8 @@ U_18(){
         else 
             log "WARN" "/etc/hosts.deny 파일에 ALL:ALL 설정이 없습니다."
             log "WARN" "U_18테스트 결과 취약"
-            ((((fail_cnt+=1))
-            failed_items+=("${FUNCNAME[0]}")))
+            ((fail_cnt+=1))
+            failed_items+=("${FUNCNAME[0]}")
             error_code=2
             break
         fi
@@ -819,8 +819,8 @@ U_18(){
     else 
         log "NOTICE" "/etc/hosts.deny 파일이 없습니다."
         log "NOTICE" "tcp_wrappers를 사용중이라면 U_18테스트 결과 취약 "
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")
         error_code=10
     fi 
 }
@@ -831,8 +831,8 @@ U_19(){
     if ls -alL /etc/xinetd.d/* 2>/dev/null | grep -Eiq "echo finger" ; then
         log "WARN" "finger서비스가 활성화 중입니다. "
         log "WARN" "U_19테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else 
         log "INFO" "U_19테스트 결과 안전" # 단, xinetd를 사용할 경우
@@ -848,8 +848,8 @@ U_20(){
     if cat /etc/passwd | grep -q "ftp"; then 
         log "WARN" "FTP계정이 존재합니다"
         log "WARN" "U_20테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else 
         log "INFO" "U_20테스트 결과 안전"
@@ -866,8 +866,8 @@ U_21(){
     if ls -alL /etc/xinetd.d/*  2>/dev/null | egrep "rsh|rlogin|rexec" | egrep -vq "grep|klogin|kshell|kexec"; then 
         log "WARN" "r계열 서비스가 실행중입니다."
         log "WARN" "U_21테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else
         log "INFO" "U_21테스트 결과 안전"
@@ -951,8 +951,8 @@ U_22(){
 
     else
         log "WARN" "U_22테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         error_code=1
     fi 
 
@@ -984,8 +984,8 @@ U_23(){
 
     if [ $error -gt 0 ]; then
         log "WARN" "U_23테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         error_code=1
 
     else
@@ -1018,8 +1018,8 @@ U_24(){
 
     if [ $error -gt 0 ]; then
         log "WARN" "U_24테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else
         log "INFO" "U_24테스트 결과 안전"
@@ -1038,8 +1038,8 @@ U_25(){
         if grep -Eq "^[^#]*\*" /etc/exports; then 
             log "WARN" "접근권한에 *가 포함되어 있습니다. "
             log "WARN" "U_25테스트 결과 취약"
-            ((((fail_cnt+=1))
-            failed_items+=("${FUNCNAME[0]}")))
+            ((fail_cnt+=1))
+            failed_items+=("${FUNCNAME[0]}")
             error_code=1
             
         else 
@@ -1052,8 +1052,8 @@ U_25(){
     else 
         log "NOTICE" "/etc/exports 파일이 존재하지 않습니다."
         log "NOTICE" "U_25테스트 결과 점검불가"
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")
         error_code=10
 
     fi 
@@ -1072,8 +1072,8 @@ U_26(){
 
     if [ $error_code -gt 0 ]; then
         log "WARN" "U_26테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
 
     else
         log "INFO" "U_26테스트 결과 안전"
@@ -1119,8 +1119,8 @@ U_27(){
 
     if [ $error -gt 0 ]; then
         log "WARN" "U_27테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else
         log "INFO" "U_27테스트 결과 안전"
@@ -1152,8 +1152,8 @@ U_28(){
 
     if [ $error -gt 0 ]; then
         log "WARN" "U_28테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else
         log "INFO" "U_28테스트 결과 안전"
@@ -1186,8 +1186,8 @@ U_29(){
 
     if [ $error -gt 0 ]; then
         log "WARN" "U_29테스트 결과 취약"
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else
         log "INFO" "U_29테스트 결과 안전"
@@ -1238,16 +1238,16 @@ U_31(){
             else 
                 log "WARN" "스팸 메일 릴레이 제한을 설정해주세요."
                 log "WARN" "U_31테스트 결과 취약"
-                ((((fail_cnt+=1))
-                failed_items+=("${FUNCNAME[0]}")))
+                ((fail_cnt+=1))
+                failed_items+=("${FUNCNAME[0]}")
                 error_code=1
             fi
 
         else 
             log "NOTICE" "/etc/mail/sendmail.cf 파일이 존재하지 않습니다."
             log "NOTICE" "U_31테스트 점검불가"        
-            ((((na_cnt+=1))
-            na_items+=("${FUNCNAME[0]}")))
+            ((na_cnt+=1))
+            na_items+=("${FUNCNAME[0]}")
             error_code=10
 
         fi 
@@ -1278,16 +1278,16 @@ U_32(){
             else 
                 log "WARN" "일반 사용자의 Sendmail실행 방지가 설정되어 있지 않습니다."
                 log "WARN" "U_32테스트 결과 취약"
-                ((((fail_cnt+=1))
-                failed_items+=("${FUNCNAME[0]}")))
+                ((fail_cnt+=1))
+                failed_items+=("${FUNCNAME[0]}")
                 error_code=1
             fi
 
         else 
             log "NOTICE" "/etc/mail/sendmail.cf 파일이 존재하지 않습니다."
             log "NOTICE" "U_32테스트 점검불가"        
-            ((((na_cnt+=1))
-            na_items+=("${FUNCNAME[0]}")))
+            ((na_cnt+=1))
+            na_items+=("${FUNCNAME[0]}")
             error_code=10
         fi 
 
@@ -1314,8 +1314,8 @@ U_34(){
             if [ $(grep -vE "^[[:space:]]*#" /etc/named.conf | grep -i "allow-transfer"  | grep -i "any" | wc -l) -gt 0 ]; then 
                 log "WARN" "Zone Transfer를 모든 사용자에게 허용중입니다."
                 log "WARN" "U_34테스트 결과 취약 "
-                ((((fail_cnt+=1))
-                failed_items+=("${FUNCNAME[0]}")))
+                ((fail_cnt+=1))
+                failed_items+=("${FUNCNAME[0]}")
                 error_code=1
             else 
                 log "INFO" "Zone Transfer를 허가된 사용자에게만 허용중입니다."
@@ -1330,8 +1330,8 @@ U_34(){
         else 
             log "NOTICE" "/etc/named.conf 설정파일이 존재하지 않습니다."
             log "NOTICE" "U_34테스트 점검불가" 
-            ((((na_cnt+=1))
-            na_items+=("${FUNCNAME[0]}")))
+            ((na_cnt+=1))
+            na_items+=("${FUNCNAME[0]}")
             error_code=10
         fi 
     fi 
@@ -1345,8 +1345,8 @@ U_35(){
         if [ "$(grep -i "^[[:space:]]*[^#]*Options[^#]*Indexes" /etc/httpd/conf/httpd.conf | wc -l)" -gt 0 ]; then 
             log "WARN" "웹서비스 디렉토리 리스팅이 작동중입니다."
             log "WARN" "U_35테스트 결과 취약 "
-            ((((fail_cnt+=1))
-            failed_items+=("${FUNCNAME[0]}")))
+            ((fail_cnt+=1))
+            failed_items+=("${FUNCNAME[0]}")
             error_code=1
         else
             log "INFO" "U_35테스트 결과 안전"
@@ -1358,8 +1358,8 @@ U_35(){
     else 
         log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
         log "NOTICE" "U_35테스트 점검불가"  
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")
         error_code=10
     fi 
 }
@@ -1384,8 +1384,8 @@ U_36(){
 
         if [ $error -gt 0 ]; then 
             log "WARN" "U_36테스트 결과 취약 " 
-            ((((fail_cnt+=1))
-            failed_items+=("${FUNCNAME[0]}")))
+            ((fail_cnt+=1))
+            failed_items+=("${FUNCNAME[0]}")
 
         else 
             log "INFO" "U_36테스트 결과 안전"
@@ -1397,8 +1397,8 @@ U_36(){
     else 
         log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
         log "NOTICE" "U_36테스트 점검불가"  
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")
         error_code=10
 
     fi 
@@ -1411,8 +1411,8 @@ U_37(){
     if [ -f /etc/httpd/conf/httpd.conf ]; then   
         if [ "$(grep "^[[:space:]]*AllowOverride[[:space:]]*None"  /etc/httpd/conf/httpd.conf | wc -l )" -gt 0 ]; then 
             log "WARN" "U_37테스트 결과 취약 " 
-            ((((fail_cnt+=1))
-            failed_items+=("${FUNCNAME[0]}")))
+            ((fail_cnt+=1))
+            failed_items+=("${FUNCNAME[0]}")
             error_code=1
         else 
             log "INFO" "U_37테스트 결과 안전"
@@ -1423,8 +1423,8 @@ U_37(){
     else 
         log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
         log "NOTICE" "U_37테스트 점검불가"  
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")
         error_code=10   
     fi 
 
@@ -1450,8 +1450,8 @@ U_38(){
     fi     
     if [ $error -gt 0 ]; then 
         log "WARN" "U_38테스트 결과 취약 " 
-        ((((fail_cnt+=1))
-        failed_items+=("${FUNCNAME[0]}")))
+        ((fail_cnt+=1))
+        failed_items+=("${FUNCNAME[0]}")
     else 
         log "INFO" "U_38테스트 결과 안전"
         ((pass_cnt+=1))
@@ -1470,8 +1470,8 @@ U_39(){
             [ "$(grep -i "^[[:space:]]*[^#]*Options[^#]*-FollowSymLinks" /etc/httpd/conf/httpd.conf | wc -l)" -eq 0 ] ; then 
             log "WARN" "심볼릭 링크, aliases가 사용 가능한 상태입니다."
             log "WARN" "U_39테스트 결과 취약 "
-            ((((fail_cnt+=1))
-            failed_items+=("${FUNCNAME[0]}")))
+            ((fail_cnt+=1))
+            failed_items+=("${FUNCNAME[0]}")
             error_code=1
         else
             log "INFO" "U_39테스트 결과 안전"
@@ -1482,8 +1482,8 @@ U_39(){
     else 
         log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
         log "NOTICE" "U_39테스트 점검불가"  
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")
         error_code=10
     fi 
 }
@@ -1499,8 +1499,8 @@ U_40(){
             if [ "$(grep -i "^[^#]*LimitRequestBody" /etc/httpd/conf/httpd.conf | awk '{print $2}' | sort -nr | head -n 1)" -gt 5000000 ]; then 
                 log "NOTICE" "업로드 및 다운로드 파일이 5M 초과로 설정되어 있는 디렉토리가 존재합니다."
                 log "NOTICE" "U_40테스트 결과 주의"
-                ((((na_cnt+=1))
-                na_items+=("${FUNCNAME[0]}")))
+                ((na_cnt+=1))
+                na_items+=("${FUNCNAME[0]}")
                 error_code=11
             else 
                 log "INFO" "U_40테스트 결과 안전"
@@ -1512,16 +1512,16 @@ U_40(){
         else
             log "WARN" "LimitRequestBody가 설정되어 있지 않습니다."
             log "WARN" "U_40테스트 결과 취약 "
-            ((((fail_cnt+=1))
-            failed_items+=("${FUNCNAME[0]}")))
+            ((fail_cnt+=1))
+            failed_items+=("${FUNCNAME[0]}")
             error_code=1
         fi 
 
     else 
         log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
         log "NOTICE" "U_40테스트 점검불가"  
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")
         error_code=10
     fi 
     
@@ -1536,8 +1536,8 @@ U_41(){
             if [ "$document_root" = "/usr/local/apache/htdocs" ] || [ "$document_root" = "/usr/local/apache2/htdocs" ] || [ "$document_root" = "/var/www/html" ]; then 
                 log "WARN" "DocumentRoot가 기본 디렉토리로 설정되어 있습니다."
                 log "WARN" "U_41테스트 결과 취약 "
-                ((((fail_cnt+=1))
-                failed_items+=("${FUNCNAME[0]}")))
+                ((fail_cnt+=1))
+                failed_items+=("${FUNCNAME[0]}")
                 error_code=1
             else 
                 log "INFO" "U_41테스트 결과 안전"
@@ -1548,15 +1548,15 @@ U_41(){
         else
             log "WARN" "DocumentRoot가 설정되어 있지 않습니다."
             log "WARN" "U_41테스트 결과 취약"
-            ((((fail_cnt+=1))
-            failed_items+=("${FUNCNAME[0]}")))
+            ((fail_cnt+=1))
+            failed_items+=("${FUNCNAME[0]}")
             error_code=2
         fi 
     else 
         log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
         log "NOTICE" "U_41테스트 점검불가" 
-        ((((na_cnt+=1))
-        na_items+=("${FUNCNAME[0]}")))
+        ((na_cnt+=1))
+        na_items+=("${FUNCNAME[0]}")
         error_code=10 
     fi 
 
