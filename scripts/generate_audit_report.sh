@@ -44,14 +44,14 @@ create_audit_result_summary() {
 
 create_audit_result_detail(){
     write_md "## 3. 상세 점검 결과"
-    while IFS=, read -r no,title,check_criteria,pass,fail,na
+    while IFS=, read -r no title check_criteria pass fail na
     do 
         write_md "### U-$no $title"
         write_md "점검 기준 : $check_criteria"
         write_md "양호 : $pass"
         write_md "경고 : $na"
         write_md "취약 : $fail"
-        write_md "점검 결과 : $audit_result[$no]"
+        write_md "점검 결과 : ${audit_result[$no]}"
         write_md " "
 
     done < "$file"
