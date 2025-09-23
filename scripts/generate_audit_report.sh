@@ -35,9 +35,9 @@ create_audit_result_summary() {
     write_md ""
     write_md "| 점검 결과 | 건수 | 상세 항목 |"
     write_md "|-----------|------|-----------|"
-    write_md "| 안전      | 2건  | U-31, U-32 |"
-    write_md "| 경고      | 1건  | U-35      |"
-    write_md "| 취약      | 1건  | U-40      |"
+    write_md "| 안전      | 2건  | ${passed_items[*]} |"
+    write_md "| 경고      | 1건  | ${failed_items[*]}      |"
+    write_md "| 취약      | 1건  | ${na_items[*]}      |"
 
 
 }
@@ -73,8 +73,6 @@ create_vuln_action_plan(){
 
 
 touch $report
-./security_audit.sh
-
 create_header
 create_audit_purpose
 create_audit_result_summary
