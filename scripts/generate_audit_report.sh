@@ -35,11 +35,9 @@ create_audit_result_summary() {
     write_md ""
     write_md "| 점검 결과 | 건수 | 상세 항목 |"
     write_md "|-----------|------|-----------|"
-    write_md "| 안전      | 2건  | ${passed_items[*]} |"
-    write_md "| 경고      | 1건  | ${failed_items[*]}      |"
-    write_md "| 취약      | 1건  | ${na_items[*]}      |"
-
-
+    write_md "| 안전      | ${pass_cnt}건  | ${passed_items[*]} |"
+    write_md "| 경고      | ${fail_cnt}건  | ${failed_items[*]} |"
+    write_md "| 취약      | ${na_cnt}건  | ${na_items[*]}      |"
 }
 
 create_audit_result_detail(){
