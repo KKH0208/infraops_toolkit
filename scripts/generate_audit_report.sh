@@ -6,6 +6,7 @@ SCRIPT_DIR=$(cd "$(dirname $0)" && pwd )
 TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 report="report_${TIMESTAMP}.md"
 source ./security_audit.sh
+csv_file="data_for_report.csv"
 
 
 #========== 함수 ============
@@ -38,18 +39,25 @@ create_audit_result_summary() {
     write_md "| 안전      | ${pass_cnt}건  | ${passed_items[*]} |"
     write_md "| 경고      | ${fail_cnt}건  | ${failed_items[*]} |"
     write_md "| 취약      | ${na_cnt}건  | ${na_items[*]}      |"
+    write_md " "
 }
 
 create_audit_result_detail(){
     write_md "## 3. 상세 점검 결과"
-    for data in "${datas[@]}"; do
-        IFS="|" read -r title pass fail na  <<< "$data"
-        write_md "### U-$((i+1)) $title"
-        write_md "점검 기준:"
-        write_md "양호: $pass"
-        write_md "경고: $na"
-        write_md "취약: $fail"
-        write_md "점검 결과: "
+    while IFS=, read -r no,title,check_criteria,pass,fail,na
+    do 
+        write_md "### U-$no $title"
+        write_md "점검 기준 : $check_criteria"
+        write_md "양호 : $pass"
+        write_md "경고 : $na"
+        write_md "취약 : $fail"
+        write_md "점검 결과 : $audit_result[$no]"
+        write_md " "
+
+    done < "$file"
+
+        
+
 
 
     done 
@@ -78,8 +86,5 @@ create_audit_result_detail
 create_vuln_action_plan
 
 cat $report
-echo $pass_cnt
-echo $fail_cnt
-echo $na_cnt
 
 

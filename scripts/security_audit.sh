@@ -14,9 +14,11 @@ na_cnt=0
 error_code=0
 error_code_array=(0 0 0 0 0 0 0 0 0 0 0 0) 
 warning_files=()
+audit_result=()
 
 #따로 분기 필요한 애들 : 2,10,13,14,22 23 24 27 28 29 38
 #잘 모르겠는 애들 : 16 17 30 33 
+#근데 16은 일단 돌리긴 가능 17 30 33은 없애고 하나씩 번호 밀자
 
 
 #불필요한~~ 이런거 무슨 서비스를 꺼야 하는지도 나오게 해야할듯 
@@ -780,7 +782,7 @@ U_16(){
 }
 
 #/etc/hosts.deny 파일에 ALL:ALL 설정이 없거나 /etc/hosts.allow 파일에 ALL:ALL 설정이 있을 경우 취약으로 판단
-U_18(){
+U_17(){
     echo "========== 접속 IP 및 포트 제한 ============"
 
     if [ -f /etc/hosts.deny ]; then 
@@ -825,7 +827,7 @@ U_18(){
     fi 
 }
 
-U_19(){
+U_18(){
     echo "========== finger서비스 활성화 유무 점검 ============"
 
     if ls -alL /etc/xinetd.d/* 2>/dev/null | grep -Eiq "echo finger" ; then
@@ -843,7 +845,7 @@ U_19(){
     fi
 }
 
-U_20(){
+U_19(){
     echo "========== FTP 계정 유무 점검 ============"
     if cat /etc/passwd | grep -q "ftp"; then 
         log "WARN" "FTP계정이 존재합니다"
@@ -861,7 +863,7 @@ U_20(){
 
 }
 
-U_21(){
+U_20(){
     echo "========== r 계열 서비스 비활성화 점검 ============"
     if ls -alL /etc/xinetd.d/*  2>/dev/null | egrep "rsh|rlogin|rexec" | egrep -vq "grep|klogin|kshell|kexec"; then 
         log "WARN" "r계열 서비스가 실행중입니다."
@@ -879,7 +881,7 @@ U_21(){
 
 }
 
-U_22(){
+U_21(){
     #ls -al /usr/bin/crontab 이 실행파일을 640 이하이고 소유자가 root임을 확인해야 함. 
     #그리고 crontab cron.hourly cron.daily cron.weekly cron.monthly cron.allow cron.deny 이 파일 및 디렉토리에 대해서도 확인해야함
     echo "========== crond 파일 소유자 및 권한 설정 ============"
@@ -958,7 +960,7 @@ U_22(){
 
 }
 
-U_23(){
+U_22(){
 
     # redhat 9버전 이후에는 xinetd -> systemctl로 바꼈다고 함 
     # systemctl로 하자 xinetd는 2013년에 지원 종료됐음. 
@@ -999,7 +1001,7 @@ U_23(){
     
 }
 
-U_24(){
+U_23(){
     echo "========== NFS 서비스 점검 ============"
     error=0
     services=(
@@ -1030,7 +1032,7 @@ U_24(){
     
 }
 
-U_25(){
+U_24(){
     # 접근 권한에 everyone(*)이 있으면 일단 경고 보내는 함수
     echo "========== NFS 접근 권한 확인 ============"
 
@@ -1061,7 +1063,7 @@ U_25(){
 }
 
 
-U_26(){
+U_25(){
     echo "========== automountd 서비스 점검 ============"
     if [ $(systemctl is-active automountd) = "active" ]; then 
     
@@ -1085,7 +1087,7 @@ U_26(){
     
 }
 
-U_27(){
+U_26(){
     echo "========== RPC 서비스 점검 ============"
 
     services=(
@@ -1131,7 +1133,7 @@ U_27(){
     
 }
 
-U_28(){
+U_27(){
     echo "========== NIS, NIS+ 점검 ============"
     error=0
     services=(
@@ -1167,7 +1169,7 @@ U_28(){
 }
 
 
-U_29(){
+U_28(){
     echo "========== tftp, talk 서비스 점검 ============"
     error=0
     services=(
@@ -1215,7 +1217,7 @@ U_29(){
 #     fi  
 # }
 
-U_31(){
+U_29(){
     echo "========== 스팸 메일 릴레이 제한 ============"
     if [ $(systemctl is-active sendmail.service ) = "inactive" ]; then 
         log "INFO" "sendmail 서비스 사용중이 아닙니다."
@@ -1255,7 +1257,7 @@ U_31(){
 
 }
 
-U_32(){
+U_30(){
     echo "========== 일반사용자의 Sendmail 실행 방지 ============"
 
     if [ $(systemctl is-active sendmail.service ) = "inactive" ]; then 
@@ -1300,7 +1302,7 @@ U_32(){
 
 
 #/etc/named.conf 파일에 allow-transfer { any; } 설정이 있으면 취약 
-U_34(){
+U_31(){
     echo "========== DNS Zone Transfer 점검 ============"
     if [ "$(systemctl is-active named )" = "inactive" ]; then 
             log "INFO" "DNS 서비스 사용중이 아닙니다."
@@ -1338,7 +1340,7 @@ U_34(){
 
 }
 
-U_35(){
+U_32(){
     #/etc/httpd/conf/httpd.conf에 Options Indexes 가 포함되어 있으면 index.html이 없을때 디렉토리 안 파일 내용을 다 보여주니 취약
     echo "========== 웹서비스 디렉토리 리스팅 점검 ============"
     if [ -f /etc/httpd/conf/httpd.conf ]; then   
@@ -1364,7 +1366,7 @@ U_35(){
     fi 
 }
 
-U_36(){
+U_33(){
     # /etc/httpd/conf/httpd.conf에서 User root Group root 이런식이면 취약 
     echo "========== 웹서비스 웹 프로세스 권한 제한 ============"
     error=0
@@ -1405,7 +1407,7 @@ U_36(){
 
 }
 
-U_37(){
+U_34(){
     #/etc/httpd/conf/httpd.conf에 AllowOverride None가 하나라도 들어있으면 안됨 
     echo "========== 웹서비스 상위 경로 이동 가능 여부 점검 ============"
     if [ -f /etc/httpd/conf/httpd.conf ]; then   
@@ -1432,7 +1434,7 @@ U_37(){
 
 
 # /usr/share/httpd/htdocs/manual 랑 /usr/share/httpd/manual 두 디렉터리 중 하나라도 존재하면 취약으로 하면 될듯 
-U_38(){
+U_35(){
     echo "========== 웹서비스 불필요한 파일 존재 여부 점검 ============"
     error=0
 
@@ -1462,7 +1464,7 @@ U_38(){
 }
 
 
-U_39(){
+U_36(){
     echo "========== 웹서비스 링크 사용금지 점검 ============"
     if [ -f /etc/httpd/conf/httpd.conf ]; then  
 
@@ -1492,7 +1494,7 @@ U_39(){
 
 
 #LimitRequestBody가 설정되어 있는지, 있다면 모든 디렉토리에 대해 설정용량을 보고 제일 큰게 5메가 이상인지 확인 
-U_40(){
+U_37(){
     echo "========== 웹서비스 파일 업로드 및 다운로드 제한 ============"
     if [ -f /etc/httpd/conf/httpd.conf ]; then  
         if [ "$(grep -i "^[^#]*LimitRequestBody" /etc/httpd/conf/httpd.conf | wc -l )" -gt 0 ]; then 
@@ -1528,7 +1530,7 @@ U_40(){
 }
 
 
-U_41(){
+U_38(){
     echo "========== 웹서비스 영역의 분리 ============"
     if [ -f /etc/httpd/conf/httpd.conf ]; then  
         if [ "$(grep -i "^[^#]*DocumentRoot" /etc/httpd/conf/httpd.conf | wc -l )" -gt 0 ]; then 
@@ -1567,11 +1569,11 @@ U_41(){
 
 load_config
 
-for num in {0..41}; do 
+for num in {0..38}; do 
     func_name="U_$(printf '%02d' "$num")"
     error_code=0
     case $num in 
-        2|10|13|14|22|23|24|27|28|29|38)
+        2|10|13|14|21|22|23|26|27|28|35)
             warning_files=()
             for j in "${!my_array[@]}"; do
             error_code_array[$j]=0
@@ -1589,6 +1591,7 @@ for num in {0..41}; do
     if declare -f "$func_name" > /dev/null; then 
 
         $func_name
+        audit_result+=($error_code)
     fi 
 done 
 
