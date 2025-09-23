@@ -1413,53 +1413,66 @@ load_config
 
 for num in {0..41}; do 
     func_name="U_$(printf '%02d' "$num")"
-    if declear -f "$func_name" > /dev/null; then 
+    error_code=0
+    case $num in 
+        2|10|13|14|22|23|24|27|28|29|38)
+            warning_files=()
+            for j in "${!my_array[@]}"; do
+            error_code_array[$j]=0
+            done
+            ;;
+        *)
+            ;;
+    esac
+
+    if declare -f "$func_name" > /dev/null; then 
+
         $func_name
     fi 
 done 
 
-U_00
-U_01
-U_02
-U_03
-U_04
-U_05
-#U_06 오래 걸려서 일단 주석처리
-U_07
-U_08
-U_09
-U_10
-U_11
-U_12
-U_13
-U_14 
-U_15
-U_16
-# U_17 뭔지 모르겠다 나중에 확인하자 
-U_18
-U_19
-U_20
-U_21
-U_22
-U_23
-U_24
-U_25
-U_26
-U_27
-U_28
-U_29
-#U_30 최신버전 확인이 빡센데
-U_31
-U_32
-#U_33 이거도 최신버전 
-U_34
-U_35
-U_36 
-U_37 
-U_38 
-U_39
-U_40
-U_41
+# U_00
+# U_01
+# U_02
+# U_03
+# U_04
+# U_05
+# #U_06 오래 걸려서 일단 주석처리
+# U_07
+# U_08
+# U_09
+# U_10
+# U_11
+# U_12
+# U_13
+# U_14 
+# U_15
+# U_16
+# # U_17 뭔지 모르겠다 나중에 확인하자 
+# U_18
+# U_19
+# U_20
+# U_21
+# U_22
+# U_23
+# U_24
+# U_25
+# U_26
+# U_27
+# U_28
+# U_29
+# #U_30 최신버전 확인이 빡센데
+# U_31
+# U_32
+# #U_33 이거도 최신버전 
+# U_34
+# U_35
+# U_36 
+# U_37 
+# U_38 
+# U_39
+# U_40
+# U_41
 
 
 
