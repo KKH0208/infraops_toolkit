@@ -6,7 +6,7 @@ SCRIPT_DIR=$(cd "$(dirname $0)" && pwd )
 TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 report="report_${TIMESTAMP}.md"
 source ./security_audit.sh
-csv_file="data_for_report.csv"
+csv_file="../config/data_for_report.csv"
 
 
 #========== 함수 ============
