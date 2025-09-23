@@ -197,7 +197,7 @@ U_02(){
         ((pass_cnt+=1))
         error_code_array[0]=1
         
-    elif [ $error_code_array[10] -eq 1 ]; then 
+    elif [ "$error_code_array[10]" -eq 1 ]; then 
         log "NOTICE" "U_02테스트 결과 경고"
         ((na_cnt+=1)) 
     else 
@@ -1421,6 +1421,11 @@ for num in {0..41}; do
             error_code_array[$j]=0
             done
             ;;
+
+        6)
+            continue
+            ;;
+
         *)
             ;;
     esac
