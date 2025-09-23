@@ -54,7 +54,7 @@ create_audit_result_detail(){
         write_md "점검 결과 : ${audit_result[$no]}"
         write_md " "
 
-    done < "$csv_file"
+    done < ../config/data_for_report.csv
 
 
 }
