@@ -12,13 +12,13 @@ fail_cnt=0
 na_cnt=0
 
 error_code=0
-error_code_array=(0 0 0 0 0 0) # U_02,U_10 << 얘네들은 에러코드 테이블도 나중에 만들어야 함.
+error_code_array=(0 0 0 0 0 0 0 0 0 0 0 0) 
+warning_files=()
 
-#U_13에서 무슨 파일에 SUID,SGID설정되어 있는지 알 수 있게 뭐 해야할듯 
-#U_14도 에러코드 설정해야함
-#U_16 major, minor number를 가지지 않는 device일 경우 삭제이거 로직을 추가해야 할듯
-#U_17은 뭐냐 확인해
-#U_22도 에러코드 복수
+#따로 분기 필요한 애들 : 2,10,13,14,22 23 24 27 28 29 38
+#잘 모르겠는 애들 : 16 17 30 33 
+
+
 #불필요한~~ 이런거 무슨 서비스를 꺼야 하는지도 나오게 해야할듯 
 passed_items=()
 failed_items=()
@@ -77,6 +77,7 @@ check_password_quality(){
             else
                 log "WARN" "$key 설정 부족"
                 error_code_array[$index]=1
+               ((error_code+=1)) 
         fi 
     else 
         log "WARN" "${key}이 설정되지 않았습니다"
@@ -170,6 +171,7 @@ U_01(){
 
 
 # 얘는 에러코드가 배열이니까 처리가 어렵긴 하구만
+# 에러코드테이블보고 인덱스 0이 1이면 안전, 인덱스 10이 1이면 경고, 나머지는 뭔가 문제가 있는거니까 순회하면서 에러내용출력
 U_02(){
     echo "========== 패스워드 복잡성 설정 ============"
     local lcredit=1 #소문자 최소 1자 이상 요구
@@ -187,13 +189,15 @@ U_02(){
         check_password_quality "minlen" "$minlen" "4"
     else 
         log "WARN" "pwquality.conf 파일이 없습니다."
-        error_code=10
+        error_code_array[10]=1
     fi
 
     if [ $error_code -eq 0 ]; then 
         log "INFO" "U_02테스트 결과 안전"
         ((pass_cnt+=1))
-    elif [ $error_code -eq 10 ]; then 
+        error_code_array[0]=1
+        
+    elif [ $error_code_array[10] -eq 1 ]; then 
         log "NOTICE" "U_02테스트 결과 경고"
         ((na_cnt+=1)) 
     else 
@@ -439,17 +443,17 @@ U_10(){
                 ((xinetd_conf+=1))
             else
                 log "WARN" "/etc/xinetd.conf 파일의 소유자가 root가 아닙니다"
-                error_code_array[0]=1
+                error_code_array[1]=1
             fi 
         else 
-            log "WARN" "/etc/xinetd.conf 파일의 권한이 너무 큽니다"
-            error_code_array[1]=1
+            log "WARN" "/etc/xinetd.conf 파일의 권한이 600이 아닙니다."
+            error_code_array[2]=1
 
         fi 
 
     else 
         log "NOTICE" "/etc/xinetd.conf파일이 존재하지 않습니다"
-        error_code_array[4]=1
+        error_code_array[10]=1
     fi 
 
     if [ -d /etc/xinetd.d ]; then 
@@ -457,16 +461,16 @@ U_10(){
             [ -f "$file" ] || continue
             check=$(find "$file" -type f -perm 600 | wc -l)
             if [ $check -ne 1 ]; then 
-                log "WARN" "${file}의 파일 권한이 너무 큽니다"
-                error_code_array[2]=1
+                log "WARN" "${file}의 파일 권한이 600이 아닙니다."
+                error_code_array[3]=1
                 ((xinetd_d-=1))
                 break
             else
                 user=$(ls -l "$file" | awk '{print $3}')
                 group=$(ls -l "$file" | awk '{print $4}')
                 if [ $user != "root" ] || [ $group != "root" ]; then 
-                    log "WARN" "/etc/xinetd.conf 파일의 소유자가 root가 아닙니다"
-                    error_code_array[3]=1
+                    log "WARN" "$file 파일의 소유자가 root가 아닙니다"
+                    error_code_array[4]=1
                     ((xinetd_d-=1))
                     break
 
@@ -477,14 +481,15 @@ U_10(){
 
     else 
         log "NOTICE" "/etc/xinetd.d 디렉토리가 존재하지 않습니다"    
-        error_code_array[5]=1
+        error_code_array[11]=1
 
     fi 
 
     if [ $xinetd_conf -eq 1 ] && [ $xinetd_d -eq 0 ]; then 
         log "INFO" "U_10테스트 결과 안전"
+        error_code_array[0]=1
         ((pass_cnt+=1))
-    elif [ "${error_code_array[4]}" -eq 1 ] || [ "${error_code_array[5]}" -eq 1 ]; then 
+    elif [ "${error_code_array[10]}" -eq 1 ] || [ "${error_code_array[11]}" -eq 1 ]; then 
         log "NOTICE" "U_10테스트 결과 경고"
         ((na_cnt+=1))
     else
@@ -564,6 +569,7 @@ U_12(){
 
 #중요 파일들에 SUID 혹은 SGID중 하나라도 설정이 되있다면 취약. 
 #파일이 없는건 취약 대상에서 뺌 
+# 워닝파일 참고하면서 무슨 파일이 위험한지 표시하면 될듯
 U_13(){
     echo "========== 불필요한 SUID,SGID 점검 ============"
     
@@ -585,8 +591,8 @@ U_13(){
     "/usr/sbin/traceroute"
     )
 
-    #SUID,SGID가 포함되어 있는 파일 목록을 저장 
-    warning_files=()
+    
+    
 
     for file in "${check_files[@]}"; do 
         if [ ! -f $file ]; then 
@@ -615,7 +621,8 @@ U_13(){
 
 }
 
-#사용자 홈 디렉토리 환경파일의 소유자가 root혹은 자신으로 지정되어있고, root와 소유자만 쓰기가 가능한 경우 
+#사용자 홈 디렉토리 환경파일의 소유자가 root혹은 자신으로 지정되어있고, root와 소유자만 쓰기가 가능한 경우
+#얘도 워닝파일 보면서 이런 파일들 문제 있으니까 고쳐라라고 하면 될듯 
 U_14(){
     echo "========== 사용자 환경파일 소유자 및 권한 점검 ============"
 
@@ -631,7 +638,6 @@ U_14(){
     ".netrc"
     )
     error=0
-    warning_files=()
     users=($(ls /home))
 
     for user in "${users[@]}"; do 
@@ -644,11 +650,13 @@ U_14(){
             file_owner=$(ls -al /home/"$user"/"$file" | awk '{print $3}') 
             if [ $file_owner != "root" ] && [ $file_owner != "$user" ]; then 
                 log "WARN" "/home/"$user"/"$file" 파일 소유자를 확인해주세요"
+                warning_files+=("$file") 
                 ((error+=1))
             else
                 check=$(find "/home/"$user"/"$file"" -type f -perm /0022 | wc -l)
                 if [ $check -eq 1 ]; then 
                     log "WARN" "/home/"$user"/"$file" 파일의 그룹 혹은 아더가 쓰기 기능을 갖고 있습니다"
+                    warning_files+=("$file") 
                     ((error+=1))
 
                     continue
@@ -660,9 +668,11 @@ U_14(){
     if [ $error -eq 0 ]; then 
         log "INFO" "U_14테스트 결과 안전"
         ((pass_cnt+=1))
+        error_code=0
     else 
         log "WARN" "U_14테스트 결과 취약"
         ((fail_cnt+=1))
+        error_code=1
 
     fi 
 
@@ -809,13 +819,15 @@ U_22(){
                 check=$(find $file -type f -perm /0137 | wc -l )
                 if [ $check -gt 0 ]; then 
                     log "WARN" "$file 파일의 권한이 너무 큽니다."
+                    warning_files+=("$file")
                     ((error+=1))
-                else
+                    else
                     file_owner=$(ls -l $file | awk '{print $3}')
                     if [ $file_owner = "root" ]; then 
                         log "INFO" "$file 파일 테스트 결과 양호"
                     else
                         log "WARN" "$file 파일 소유자가 root가 아닙니다."
+                        warning_files+=("$file")
                         ((error+=1))
 
                     fi 
@@ -826,6 +838,7 @@ U_22(){
                      check=$(find $sub_file -type f -perm /0137 | wc -l )
                         if [ $check -gt 0 ]; then 
                             log "WARN" "$sub_file 파일의 권한이 너무 큽니다."
+                            warning_files+=("$file")
                             ((error+=1))
 
                         else
@@ -834,6 +847,7 @@ U_22(){
                                 log "INFO" "$sub_file 파일 테스트 결과 양호"
                             else
                                 log "WARN" "$sub_file 파일 소유자가 root가 아닙니다."
+                                warning_files+=("$file")
                                 ((error+=1))
 
                             fi 
@@ -852,6 +866,7 @@ U_22(){
     else
         log "WARN" "U_22테스트 결과 취약"
         ((fail_cnt+=1))
+        error_code=1
     fi 
 
 }
@@ -875,6 +890,7 @@ U_23(){
     for service in "${services[@]}"; do 
         if [ $(systemctl is-active $service) = "active" ]; then 
             log "WARN" "$service 서비스가 동작중입니다."
+            warning_files+=("$service")
             ((error+=1))
         fi 
     done 
@@ -905,6 +921,7 @@ U_24(){
     for service in "${services[@]}"; do 
         if [ $(systemctl is-active $service) = "active" ]; then 
             log "WARN" "$service 서비스가 동작중입니다."
+            warning_files+=("$service")
             ((error+=1))
         fi 
     done 
@@ -995,6 +1012,8 @@ U_27(){
 
             log "WARN" "$service 서비스가 동작중입니다."
             ((error+=1))
+            warning_files+=("$service")
+
         fi 
     done 
 
@@ -1023,6 +1042,7 @@ U_28(){
     for service in "${services[@]}"; do 
         if [ $(systemctl is-active $service) = "active" ]; then 
             log "WARN" "$service 서비스가 실행중입니다."
+            warning_files+=("$service")
             ((error+=1))
         fi 
     done 
@@ -1053,6 +1073,7 @@ U_29(){
     for service in "${services[@]}"; do 
         if [ $(systemctl is-active $service) = "active" ]; then 
             log "WARN" "$service 서비스가 실행중입니다."
+            warning_files+=("$service")
             ((error+=1))
         fi 
     done 
@@ -1279,10 +1300,12 @@ U_38(){
     if [ -d /usr/share/httpd/htdocs/manual ]; then 
         log "WARN" "/usr/share/httpd/htdocs/manual 디렉터리가 존재합니다."
         error_code=1
+        warning_files+=(/usr/share/httpd/htdocs/manual)
         ((error+=1))
     fi 
     if [ -d /usr/share/httpd/manual ]; then 
         log "WARN" "/usr/share/httpd/manual 디렉터리가 존재합니다."
+        warning_files+=(/usr/share/httpd/manual)
         error_code=2
         ((error+=1))
     fi     
@@ -1387,6 +1410,14 @@ U_41(){
 #이거도 반복문으로 돌려도 될듯? 
 
 load_config
+
+for num in {0..41}; do 
+    func_name="U_$(printf '%02d' "$num")"
+    if declear -f "$func_name" > /dev/null; then 
+        $func_name
+    fi 
+done 
+
 U_00
 U_01
 U_02
@@ -1429,6 +1460,14 @@ U_38
 U_39
 U_40
 U_41
+
+
+
+
+
+
+
+
 
 
 

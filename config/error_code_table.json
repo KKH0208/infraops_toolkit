@@ -23,6 +23,15 @@
     "10": {"desc": "ssh설정파일이 없습니다.", "action": "ssh 설치 여부를 확인해주세요"}
   },
 
+    "U_02": {
+    "0": {"desc": "패스워드 복잡성 설정이 완료된 상태"},
+    "1": {"desc": "최소 소문자 개수 부족", "action": "/etc/security/pwquality.conf 파일의 lcredit 값을 확인해주세요."},
+    "2": {"desc": "최소 대문자 개수 부족", "action": "/etc/security/pwquality.conf 파일의 ucredit 값을 확인해주세요."},
+    "3": {"desc": "최소 숫자 개수 부족", "action": "/etc/security/pwquality.conf 파일의 dcredit 값을 확인해주세요."},
+    "4": {"desc": "최소 특수문자 개수 부족", "action": "/etc/security/pwquality.conf 파일의 ocredit 값을 확인해주세요."},
+    "5": {"desc": "최소 패스워드 길이가 짧습니다.", "action": "/etc/security/pwquality.conf 파일의 minlen 값을 확인해주세요."},
+    "10": {"desc": "패스워드 설정파일이 없습니다.", "action": "/etc/security/pwquality.conf 파일을 확인해주세요."}
+  },
 
 
   "U_03": {
@@ -70,6 +79,16 @@
     "10": {"desc": "/etc/hosts 파일이 존재하지 않습니다.", "action": "/etc/hosts 파일을 생성해주세요"}
   },
 
+
+    "U_10": {
+    "0": {"desc": "xinetd 관련 파일의 권한이 적절하게 설정되어 있음"},
+    "1": {"desc": "/etc/xinetd.conf 파일의 소유자가 root가 아닙니다.", "action": "/etc/xinetd.conf 파일의 소유자를 root로 변경해주세요."},
+    "2": {"desc": "/etc/xinetd.conf 파일의 권한이 600이 아닙니다. ", "action": "/etc/xinetd.conf 파일의 권한을 600으로 조절해주세요."},
+    "10": {"desc": "/etc/xinetd.d 디렉토리 아래에 파일의 권한이 600이 아닌 파일이 존재합니다.", "action": "/etc/xinetd.d 디렉토리 아래에 있는 파일들의 권한을 600으로 맞춰주세요."},
+    "11": {"desc": "/etc/xinetd.d 디렉토리 아래에 파일의 소유자가 root가 아닌 파일이 존재합니다.", "action": "/etc/xinetd.d 디렉토리 아래에 있는 파일들의 소유자를 root로 맞춰주세요."}
+  },
+
+
     "U_11": {
     "0": {"desc": "rsyslog.conf 파일의 권한이 적절하게 설정되어 있음"},
     "1": {"desc": "rsyslog.conf 파일의 권한이 큽니다.", "action": "rsyslog.conf 파일의 권한을 640 이하로 설정해주세요. "},
@@ -88,10 +107,16 @@
     "1": {"desc": "SUID 혹은 SGID가 설정되어 있는 중요 파일이 존재함", "action": "불필요한 SUID 혹은 SGID을 제거해주세요 명령어: chmod -s <file_name> "},
   },
 
+    "U_14": {
+    "0": {"desc": "사용자 환경파일의 소유자 및 권한이 적절하게 설정되어 있음"},
+    "1": {"desc": "사용자 환경파일의 소유자 및 권한이 적절하지 않은 파일이 존재함", "action": "사용자 환경파일의 소유자 및 권한을 확인해주세요."},
+  },
+
     "U_15": {
     "0": {"desc": "world writable 파일이 존재하지 않음"},
     "1": {"desc": "world writable 파일이 존재함", "action": "불필요한 world writable 파일을 제거해주세요"}
   },
+
     "U_16": {
     "0": {"desc": "/dev 디렉토리 이상 무"},
     "1": {"desc": "/dev에 파일 타입의 데이터가 존재하거나 major, minor number를 가지지 않는 device 파일이 존재", "action": "불필요한 device파일을 제거해주세요"}
@@ -117,6 +142,11 @@
     "U_21": {
     "0": {"desc": "불필요한 r계열 서비스가 비활성화 되어 있습니다."},
     "1": {"desc": "r계열 서비스가 실행중입니다.", "action": "실행중인 r계열 서비스를 중지해주세요. ex) rsh/rlogin/rexec..."},
+    },
+
+    "U_22": {
+    "0": {"desc": "crond 파일 소유자 및 권한이 적절하게 설정되어 있습니다."},
+    "1": {"desc": "파일의 권한이 크거나 소유자가 root가 아닌 파일 혹은 디렉토리가 존재합니다.", "action": "파일 혹은 디렉토리의 권한을 640 이하로 설정하거나 소유자를 root로 변경해주세요."},
     },
 
     "U_23": {
