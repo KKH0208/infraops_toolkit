@@ -82,6 +82,8 @@ create_vuln_action_plan(){
         item=${failed_items[$idx]}
         
         write_md "## $item "
+        echo "DEBUG: item='$item'"
+        
 
         case $item in 
             U_02|U_10|U_13|U_14|U_22|U_23|U_24|U_27|U_28|U_29|U_38)
