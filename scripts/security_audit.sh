@@ -15,9 +15,9 @@ error_code=0
 error_code_array=(0 0 0 0 0 0 0 0 0 0 0 0) 
 warning_files=()
 audit_result=()
-error_code_list=()
-declare -A error_code_dict
-error_code_dict["test"]="1 2"
+error_code_list=()      # 얘가 일반경우일때의 에러코드를 보관하는 애들, 어차피 에러코드는 하나일테니 
+declare -A error_code_dict  #얘가 복잡할 경우. 키가 U_01이면 값이 (1 2 3) 이런식으로 경우에 대해 출력해야하는 모든 에러코드가 존재
+
 
 
 
@@ -1621,7 +1621,7 @@ for num in {0..38}; do
                 error_code_dict["$func_name"]="${error_codes[*]}" 
                 ;;
             *)
-                error_code_list+=("$num")
+                error_code_list+=("$error_code")
                 ;;
         esac
     fi 

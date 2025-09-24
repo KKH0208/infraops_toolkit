@@ -70,99 +70,51 @@ create_audit_result_detail(){
 
 }
 
-# create_vuln_action_plan(){
-#     write_md "## 4. 취약 항목 요약 및 조치"
-
-#     for key in "${!error_code_dict[@]}"; do
-#         echo "$key → ${error_code_dict[$key]}"
-#     done
-
-    
-#     for idx in "${!failed_items[@]}";do
-#         item=${failed_items[$idx]}
-        
-#         write_md "## $item "
-#         write_md "DEBUG: item='$item'"
-        
-
-#         case $item in 
-#             U_02|U_10|U_13|U_14|U_22|U_23|U_24|U_27|U_28|U_29|U_38)
-#                 echo "특수경우 실행!"
-#                 error_code_len=$(echo "${error_code_dict[$item]}" | wc -w)
-#                 subkeys=(${error_code_dict[$item]}) #문자열이니까 일단 배열로 만들어주고 쓰자.
-#                 for ((i=0;i<error_code_len;i++)); do 
-#                     write_md "$item  $subkeys[$i]"
-#                     desc=$(jq -r --arg k "$item" --arg sk "${subkeys[$i]}" '.[$k][$sk].desc' "$json_file")
-#                     action=$(jq -r --arg k "$item" --arg sk "${subkeys[$i]}" '.[$k][$sk].action // ""' "$json_file")
-#                     write_md "- 상황: $desc"
-#                     write_md "- 조치: $action"
-#                     write_md " "
-
-#                 done 
-#                 ;;
-#             *)
-#                 write_md "일반경우 실행!"
-#                 subkey=${error_code_list[$idx]}
-#                 desc=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].desc' "$json_file")
-#                 action=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].action // ""' "$json_file")
-#                 write_md "- 상황: $desc"
-#                 write_md "- 조치: $action"
-#                 write_md " "
-#                 ;;
-#         esac
-
-#     done 
-
-# }
-
 create_vuln_action_plan(){
     write_md "## 4. 취약 항목 요약 및 조치"
 
-    # 전체 error_code_dict 확인 (디버그)
     for key in "${!error_code_dict[@]}"; do
-        echo "DEBUG: $key → ${error_code_dict[$key]}"
+        echo "$key → ${error_code_dict[$key]}"
     done
 
-    for idx in "${!failed_items[@]}"; do
+    
+    for idx in "${!failed_items[@]}";do
         item=${failed_items[$idx]}
         
         write_md "## $item "
         write_md "DEBUG: item='$item'"
+        
 
         case $item in 
             U_02|U_10|U_13|U_14|U_22|U_23|U_24|U_27|U_28|U_29|U_38)
                 echo "특수경우 실행!"
-                
-                # 해당 항목의 error_code_array 순회
-                IFS=' ' read -r -a codes <<< "${error_code_dict[$item]}"
-                for subkey in "${codes[@]}"; do
-                    # JSON에서 desc/action 가져오기
-                    desc=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].desc // ""' "$json_file")
-                    action=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].action // ""' "$json_file")
-
-                    # 값이 있을 때만 출력
-                    if [[ -n "$desc" ]]; then
-                        write_md "- 상황: $desc"
-                        write_md "- 조치: $action"
-                        write_md " "
-                    fi
-                done
-                ;;
-            *)
-                echo "일반경우 실행!"
-                subkey=${error_code_list[$idx]}
-                desc=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].desc // ""' "$json_file")
-                action=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].action // ""' "$json_file")
-
-                if [[ -n "$desc" ]]; then
+                error_code_len=$(echo "${error_code_dict[$item]}" | wc -w)
+                subkeys=(${error_code_dict[$item]}) #문자열이니까 일단 배열로 만들어주고 쓰자.
+                for ((i=0;i<error_code_len;i++)); do 
+                    write_md "$item  $subkeys[$i]"
+                    desc=$(jq -r --arg k "$item" --arg sk "${subkeys[$i]}" '.[$k][$sk].desc' "$json_file")
+                    action=$(jq -r --arg k "$item" --arg sk "${subkeys[$i]}" '.[$k][$sk].action // ""' "$json_file")
                     write_md "- 상황: $desc"
                     write_md "- 조치: $action"
                     write_md " "
-                fi
+
+                done 
+                ;;
+            *)
+                write_md "일반경우 실행!"
+                subkey=${error_code_list[$idx]}
+                desc=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].desc' "$json_file")
+                action=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].action // ""' "$json_file")
+                write_md "- 상황: $desc"
+                write_md "- 조치: $action"
+                write_md " "
                 ;;
         esac
-    done
+
+    done 
+
 }
+
 
 
 
