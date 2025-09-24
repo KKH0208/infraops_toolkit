@@ -82,7 +82,7 @@ create_vuln_action_plan(){
         item=${failed_items[$idx]}
         
         write_md "## $item "
-        echo "DEBUG: item='$item'"
+        write_md "DEBUG: item='$item'"
         
 
         case $item in 
@@ -91,7 +91,7 @@ create_vuln_action_plan(){
                 error_code_len=$(echo "${error_code_dict[$item]}" | wc -w)
                 subkeys=(${error_code_dict[$item]}) #문자열이니까 일단 배열로 만들어주고 쓰자.
                 for ((i=0;i<error_code_len;i++)); do 
-                    echo "$item  $subkeys[$i]"
+                    write_md "$item  $subkeys[$i]"
                     desc=$(jq -r --arg k "$item" --arg sk "${subkeys[$i]}" '.[$k][$sk].desc' "$json_file")
                     action=$(jq -r --arg k "$item" --arg sk "${subkeys[$i]}" '.[$k][$sk].action // ""' "$json_file")
                     write_md "- 상황: $desc"
@@ -101,7 +101,7 @@ create_vuln_action_plan(){
                 done 
                 ;;
             *)
-                echo "일반경우 실행!"
+                write_md "일반경우 실행!"
                 subkey=${error_code_list[$idx]}
                 desc=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].desc' "$json_file")
                 action=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].action // ""' "$json_file")
