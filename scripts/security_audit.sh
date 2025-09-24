@@ -1613,7 +1613,7 @@ for num in {0..38}; do
                 error_codes+=("$idx")
             fi 
         done 
-        error_code_dict["$func_name"]="${error_codes[*]}"
+        error_code_dict["$func_name"]="${error_codes[*]}" 
 
     fi 
 done 
