@@ -16,6 +16,8 @@ error_code_array=(0 0 0 0 0 0 0 0 0 0 0 0)
 warning_files=()
 audit_result=()
 declare -A error_code_dict
+error_code_dict["test"]="1 2"
+
 
 
 #따로 분기 필요한 애들 : 2,10,13,14,22 23 24 27 28 29 38   이 놈들은 error_code_list값 순회하고 1이면 Json에서 가져와서 반복해서 출력해야할듯 
