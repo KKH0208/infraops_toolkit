@@ -72,6 +72,11 @@ create_audit_result_detail(){
 
 create_vuln_action_plan(){
     write_md "## 4. 취약 항목 요약 및 조치"
+
+    for key in "${!error_code_dict[@]}"; do
+        echo "$key → ${error_code_dict[$key]}"
+    done
+
     
     for idx in "${!failed_items[@]}";do
         item=${failed_items[$idx]}
