@@ -79,7 +79,7 @@ create_vuln_action_plan(){
         write_md "## $item "
 
         case $item in 
-            2|10|13|14|22|23|24|27|28|29|38)
+            U_02|U_10|U_13|U_14|U_22|U_23|U_24|U_27|U_28|U_29|U_38)
                 error_code_len=$(echo "${error_code_dict[$item]}" | wc -w)
                 subkeys=(${error_code_dict[$item]}) #문자열이니까 일단 배열로 만들어주고 쓰자.
                 for ((i=0;i<error_code_len;i++)); do 
