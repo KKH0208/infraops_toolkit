@@ -15,6 +15,7 @@ error_code=0
 error_code_array=(0 0 0 0 0 0 0 0 0 0 0 0) 
 warning_files=()
 audit_result=()
+error_code_list=()
 declare -A error_code_dict
 error_code_dict["test"]="1 2"
 
@@ -1607,14 +1608,22 @@ for num in {0..38}; do
 
         #에러코드 모아놔서 레포트 4에 쓰기 위해
         # error_code_array를 순회하면서 1이면 그때의 인덱스를 error_code_dict에 저장하는거지
-        error_codes=()
-        for idx in "${!error_code_array[@]}"; do
-            if [ "${error_code_array[$idx]}" -eq 1 ]; then 
-                error_codes+=("$idx")
-            fi 
-        done 
-        error_code_dict["$func_name"]="${error_codes[*]}" 
 
+
+        case $num in
+            2|10|13|14|21|22|23|26|27|28|35)
+                error_codes=()
+                for idx in "${!error_code_array[@]}"; do
+                    if [ "${error_code_array[$idx]}" -eq 1 ]; then 
+                        error_codes+=("$idx")
+                    fi 
+                done 
+                error_code_dict["$func_name"]="${error_codes[*]}" 
+                ;;
+            *)
+                error_code_list+=("$num")
+                ;;
+        esac
     fi 
 done 
 
