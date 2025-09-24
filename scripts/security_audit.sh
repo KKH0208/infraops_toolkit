@@ -15,10 +15,10 @@ error_code=0
 error_code_array=(0 0 0 0 0 0 0 0 0 0 0 0) 
 warning_files=()
 audit_result=()
-error_code_list=()
+declare -A error_code_dict
 
 
-#따로 분기 필요한 애들 : 2,10,13,14,22 23 24 27 28 29 38
+#따로 분기 필요한 애들 : 2,10,13,14,22 23 24 27 28 29 38   이 놈들은 error_code_list값 순회하고 1이면 Json에서 가져와서 반복해서 출력해야할듯 
 #잘 모르겠는 애들 : 16 17 30 33 
 #근데 16은 일단 돌리긴 가능 17 30 33은 없애고 하나씩 번호 밀자
 
@@ -1574,11 +1574,13 @@ load_config
 for num in {0..38}; do 
     func_name="U_$(printf '%02d' "$num")"
     error_code=0
+
+    # 밑에 초기화 전에 워닝파일을 활용해야 하는디..
     case $num in 
         2|10|13|14|21|22|23|26|27|28|35)
             warning_files=()
-            for j in "${!my_array[@]}"; do
-            error_code_array[$j]=0
+            for j in "${!error_code_array[@]}"; do
+                error_code_array[$j]=0
             done
             ;;
 
@@ -1602,7 +1604,14 @@ for num in {0..38}; do
         fi 
 
         #에러코드 모아놔서 레포트 4에 쓰기 위해
-        error_code_list+=("$error_code")
+        # error_code_array를 순회하면서 1이면 그때의 인덱스를 error_code_dict에 저장하는거지
+        error_codes=()
+        for idx in "${!error_code_array[@]}"; do
+            if [ "${error_code_array[$idx]}" -eq 1 ]; then 
+                error_codes+=("$idx")
+            fi 
+        done 
+        error_code_dict["$func_name"]="${error_codes[*]}"
 
     fi 
 done 

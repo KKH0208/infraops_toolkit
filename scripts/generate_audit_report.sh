@@ -1,3 +1,12 @@
+
+
+
+#2,10,13,14,22 23 24 27 28 29 38 이 놈들은 error_code_list값 순회하고 1이면 Json에서 가져와서 반복해서 출력해야할듯 case로 저 번호일땐 순회해서 1이면 출력 이런 느낌으로 create_vuln_action_plan 고치자 
+
+
+
+
+
 #/bin/bash 
 
 #========== 설정 ============
@@ -22,11 +31,13 @@ create_header() {
     write_md "**작성일:** $(date '+%y-%m-%d')"
     write_md "**점검 대상:** EC2 Apache 서버 (IP: 192.168.0.1)"
     write_md "**작성자:** ${USER}"
+    write_md " "
 }
 
 create_audit_purpose() {
     write_md "## 1. 서버 보안 감사 목적"
     write_md "본 부서에서 관리하는 50대의 리눅스 서버에 대해 보안관리가 제대로 이루어지고 있는지 점검하는 것을 목적으로 한다."
+    write_md " "
 }
 
 
@@ -63,14 +74,33 @@ create_vuln_action_plan(){
     write_md "## 4. 취약 항목 요약 및 조치"
     
     for idx in "${!failed_items[@]}";do
-        
         item=${failed_items[$idx]}
-        subkey=${error_code_list[$idx]}
-        desc=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].desc' "$json_file")
-        action=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].action // ""' "$json_file")
+        
         write_md "## $item "
-        write_md "- 상황: $desc"
-        write_md "- 조치: $action"
+
+        case $item in 
+            2|10|13|14|22|23|24|27|28|29|38)
+                error_code_len=$(echo "${error_code_dict[$item]}" | wc -w)
+                subkeys=(${error_code_dict[$item]}) #문자열이니까 일단 배열로 만들어주고 쓰자.
+                for ((i=0;i<error_code_len;i++)); do 
+                    desc=$(jq -r --arg k "$item" --arg sk "$subkeys[$i]" '.[$k][$sk].desc' "$json_file")
+                    action=$(jq -r --arg k "$item" --arg sk "$subkeys[$i]" '.[$k][$sk].action // ""' "$json_file")
+                    write_md "- 상황: $desc"
+                    write_md "- 조치: $action"
+                    write_md " "
+
+                done 
+                ;;
+            *)
+                subkey=${error_code_list[$idx]}
+                desc=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].desc' "$json_file")
+                action=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].action // ""' "$json_file")
+                write_md "- 상황: $desc"
+                write_md "- 조치: $action"
+                write_md " "
+                ;;
+        esac
+
     done 
 
 }
