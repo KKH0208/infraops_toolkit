@@ -1587,9 +1587,9 @@ for num in {0..38}; do
             done
             ;;
 
-        6)
-            continue
-            ;;
+        # 6)
+        #     continue
+        #     ;;
 
         *)
             ;;
