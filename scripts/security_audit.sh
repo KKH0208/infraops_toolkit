@@ -758,7 +758,7 @@ U_14(){
 U_15(){
     echo "========== world writable 파일 점검 ============"
     ww_files=$(find / -path /proc -prune -o -path /sys -prune -o -path /dev -prune -o -type f -perm -2 2>/dev/null)
-    if [ -n "$ww_files" ]; then 
+    if [ -z "$ww_files" ]; then 
         log "INFO" "U_15테스트 결과 안전"
         ((pass_cnt+=1))
 		passed_items+=("${FUNCNAME[0]}")
@@ -1584,7 +1584,7 @@ for num in {0..38}; do
 
     # 밑에 초기화 전에 워닝파일을 활용해야 하는디..
     case $num in 
-        2|10|13|14|21|22|23|26|27|28|35)
+        2|10|35)
             for j in "${!error_code_array[@]}"; do
                 error_code_array[$j]=0
             done
@@ -1616,7 +1616,7 @@ for num in {0..38}; do
         if [ $error_code -ne 0 ]; then 
             
             case $num in
-                2|10|13|14|21|22|23|26|27|28|35)
+                2|10|35)
                     error_codes=()
                     for idx in "${!error_code_array[@]}"; do
                         if [ "${error_code_array[$idx]}" -eq 1 ]; then 
