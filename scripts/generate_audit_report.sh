@@ -119,7 +119,16 @@ create_vuln_action_plan(){
                         write_md "$file"
                     done    
                 fi 
-                
+                if [ "$item" == "U_13" ]; then 
+                    write_md "SUID 혹은 SGID가 설정되어 있는 중요 파일 목록"
+
+                    # 연관 배열에서 값을 가져와서, 공백을 기준으로 배열로 분리
+                    local files_to_print=(${warning_files[U_13]}) 
+                    
+                    for file in "${files_to_print[@]}"; do 
+                        write_md "$file"
+                    done 
+                fi
                 ;;
         esac
 
