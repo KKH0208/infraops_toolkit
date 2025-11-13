@@ -199,11 +199,11 @@ U_02(){
     local file="/etc/security/pwquality.conf"
 
     if [ -f "$file" ]; then 
-        check_password_quality "lcredit" "$lcredit" "0"
-        check_password_quality "ucredit" "$ucredit" "1"
-        check_password_quality "dcredit" "$dcredit" "2"
-        check_password_quality "ocredit" "$ocredit" "3"
-        check_password_quality "minlen" "$minlen" "4"
+        check_password_quality "lcredit" "$lcredit" "1"
+        check_password_quality "ucredit" "$ucredit" "2"
+        check_password_quality "dcredit" "$dcredit" "3"
+        check_password_quality "ocredit" "$ocredit" "4"
+        check_password_quality "minlen" "$minlen" "5"
     else 
         log "WARN" "pwquality.conf 파일이 없습니다."
         error_code_array[10]=1
@@ -1633,6 +1633,59 @@ for num in {0..38}; do
     fi 
 done 
 
+
+
+# =========================================================
+# ⭐⭐⭐ 디버깅: 취약점 기록 변수 최종 확인 ⭐⭐⭐
+# 이 코드는 모든 점검 함수 실행 후 변수 상태를 확인합니다.
+# =========================================================
+
+echo ""
+echo "========================================================"
+echo "🚨 취약점 기록 변수 최종 상태 (디버깅 정보)"
+echo "========================================================"
+
+# 1. warning_files (특정 파일/서비스 목록) 확인
+echo "### 1. warning_files (특수 항목에서 취약한 파일/서비스 목록) ###"
+if [ ${#warning_files[@]} -eq 0 ]; then
+    echo "> 비어 있음"
+else
+    for key in "${!warning_files[@]}"; do
+        # 'U_xx' 항목별로 저장된 목록 출력
+        echo "> $key 항목: [${warning_files[$key]}]"
+    done
+fi
+
+echo "--------------------------------------------------------"
+
+# 2. error_code_list (일반 항목의 단일 에러코드 목록) 확인
+echo "### 2. error_code_list (일반 항목의 단일 에러코드 목록) ###"
+if [ ${#error_code_list[@]} -eq 0 ]; then
+    echo "> 비어 있음"
+else
+    # 배열 내용을 공백으로 구분하여 출력
+    echo "> [${error_code_list[*]}]" 
+fi
+
+echo "--------------------------------------------------------"
+
+# 3. error_code_dict (특수 항목의 복수 에러코드 맵) 확인
+echo "### 3. error_code_dict (특수 항목의 복수 에러코드 맵) ###"
+if [ ${#error_code_dict[@]} -eq 0 ]; then
+    echo "> 비어 있음"
+else
+    for key in "${!error_code_dict[@]}"; do
+        # 'U_xx' 항목별로 저장된 에러코드 목록(공백 구분된 문자열) 출력
+        echo "> $key 항목: [${error_code_dict[$key]}]"
+    done
+fi
+
+echo "========================================================"
+echo ""
+
+# =========================================================
+# ⭐⭐⭐ 디버깅 코드 끝 ⭐⭐⭐
+# =========================================================
 # U_00
 # U_01
 # U_02
