@@ -1449,6 +1449,7 @@ U_35(){
     if [ -d /usr/share/httpd/htdocs/manual ]; then 
         log "WARN" "/usr/share/httpd/htdocs/manual 디렉터리가 존재합니다."
         error_code=1
+        error_code_array[1]=1
         warning_files["U_35"]+="/usr/share/httpd/htdocs/manual "
         ((error+=1))
     fi 
@@ -1456,6 +1457,7 @@ U_35(){
         log "WARN" "/usr/share/httpd/manual 디렉터리가 존재합니다."
         warning_files["U_35"]+="/usr/share/httpd/manual "
         error_code=2
+        error_code_array[2]=1
         ((error+=1))
     fi     
     if [ $error -gt 0 ]; then 
@@ -1549,6 +1551,7 @@ U_38(){
                 ((fail_cnt+=1))
                 failed_items+=("${FUNCNAME[0]}")
                 error_code=1
+                error_code_array[1]=1
             else 
                 log "INFO" "U_38테스트 결과 안전"
                 ((pass_cnt+=1))
@@ -1561,6 +1564,7 @@ U_38(){
             ((fail_cnt+=1))
             failed_items+=("${FUNCNAME[0]}")
             error_code=2
+            error_code_array[2]=1
         fi 
     else 
         log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
@@ -1568,6 +1572,7 @@ U_38(){
         ((na_cnt+=1))
         na_items+=("${FUNCNAME[0]}")
         error_code=10 
+        error_code_array[10]=1
     fi 
 
 }
@@ -1584,7 +1589,7 @@ for num in {0..38}; do
 
     # 밑에 초기화 전에 워닝파일을 활용해야 하는디..
     case $num in 
-        2|10|35)
+        2|10|35|38)
             for j in "${!error_code_array[@]}"; do
                 error_code_array[$j]=0
             done
@@ -1614,9 +1619,11 @@ for num in {0..38}; do
         # error_code_array를 순회하면서 1이면 그때의 인덱스를 error_code_dict에 저장하는거지
 
         if [ $error_code -ne 0 ]; then 
-            
+            if [ $error_code -lt 10 ]; then 
+                error_code_list+=("$error_code")
+
             case $num in
-                2|10|35)
+                2|10|35|38)
                     error_codes=()
                     for idx in "${!error_code_array[@]}"; do
                         if [ "${error_code_array[$idx]}" -eq 1 ]; then 
@@ -1624,10 +1631,10 @@ for num in {0..38}; do
                         fi 
                     done 
                     error_code_dict["$func_name"]="${error_codes[*]}" 
-                    error_code_list+=("$error_code")
+
                     ;;
                 *)
-                    error_code_list+=("$error_code")
+
                     echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!에러코드리스트 추가 qjsgh $num"
                     ;;
             esac

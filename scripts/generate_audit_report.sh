@@ -4,7 +4,7 @@
 #2,10,13,14,22 23 24 27 28 29 38 이 놈들은 error_code_list값 순회하고 1이면 Json에서 가져와서 반복해서 출력해야할듯 case로 저 번호일땐 순회해서 1이면 출력 이런 느낌으로 create_vuln_action_plan 고치자 
 
 
-
+#아니 2 10 35가 에러코드 여러개일 수 있는놈이고 13 14 21 22 26 27 28 35가 파일혹은 서비스 종류를 제시해야 하는 놈인데 지금 문제가 35때문이네
 
 
 #/bin/bash 
@@ -86,8 +86,8 @@ create_vuln_action_plan(){
         
 
         case $item in 
-            U_02|U_10|U_23|U_24|U_29|U_38)
-                
+            U_02|U_10|U_35|U_38)
+
                 write_md "특수경우 실행!"
                 error_code_len=$(echo "${error_code_dict[$item]}" | wc -w)
                 write_md $error_code_len
@@ -112,7 +112,7 @@ create_vuln_action_plan(){
                 write_md "- 조치: $action"
                 write_md " "
 
-                if [[ "$item" == "U_13" || "$item" == "U_14" || "$item" == "U_21" || "$item" == "U_22" || "$item" == "U_26" || "$item" == "U_27" || "$item" == "U_28" || "$item" == "U_35" ]]; then 
+                if [[ "$item" == "U_13" || "$item" == "U_14" || "$item" == "U_21" || "$item" == "U_22" || "$item" == "U_23" || "$item" == "U_26" || "$item" == "U_27" || "$item" == "U_28" || "$item" == "U_35" ]]; then 
                     if [ "$item" == "U_13" ]; then 
                         write_md "SUID 혹은 SGID가 설정되어 있는 중요 파일 목록"  
                         local files_to_print=(${warning_files[U_13]})          
@@ -125,6 +125,9 @@ create_vuln_action_plan(){
                     elif [ "$item" == "U_22" ]; then 
                         write_md "실행중인 DoS 공격에 취약한 서비스 목록"     
                         local files_to_print=(${warning_files[U_22]})
+                    elif [ "$item" == "U_23" ]; then 
+                        write_md "실행중인 NFS 관련 서비스 목록"     
+                        local files_to_print=(${warning_files[U_23]})                        
                     elif [ "$item" == "U_26" ]; then 
                         write_md "실행중인 RPC 관련 서비스 목록"
                         local files_to_print=(${warning_files[U_26]})
