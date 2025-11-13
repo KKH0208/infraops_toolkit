@@ -795,13 +795,13 @@ U_17(){
             if [ -f /etc/hosts.allow ]; then 
                 if grep -Eiq '^\s*ALL\s*:\s*ALL\s*$' /etc/host.allow; then 
                     log "WARN" "/etc/hosts.allow 파일에 ALL:ALL 설정이 있습니다."
-                    log "WARN" "U_18테스트 결과 취약"
+                    log "WARN" "U_17테스트 결과 취약"
                     ((fail_cnt+=1))
                     failed_items+=("${FUNCNAME[0]}")
                     error_code=1
                     break                    
                 else 
-                    log "INFO" "U_18테스트 결과 안전" 
+                    log "INFO" "U_17테스트 결과 안전" 
                     ((pass_cnt+=1))
 		            passed_items+=("${FUNCNAME[0]}")
 
@@ -809,14 +809,14 @@ U_17(){
                 fi
             else 
                 log "INFO" "/etc/hosts.allow 파일이 없습니다"
-                log "INFO" "U_18테스트 결과 안전" # /etc/hosts.allow은 없어도 괜찮음.
+                log "INFO" "U_17테스트 결과 안전" # /etc/hosts.allow은 없어도 괜찮음.
                 ((pass_cnt+=1))
 		        passed_items+=("${FUNCNAME[0]}")
 
             fi
         else 
             log "WARN" "/etc/hosts.deny 파일에 ALL:ALL 설정이 없습니다."
-            log "WARN" "U_18테스트 결과 취약"
+            log "WARN" "U_17테스트 결과 취약"
             ((fail_cnt+=1))
             failed_items+=("${FUNCNAME[0]}")
             error_code=2
@@ -825,7 +825,7 @@ U_17(){
 
     else 
         log "NOTICE" "/etc/hosts.deny 파일이 없습니다."
-        log "NOTICE" "tcp_wrappers를 사용중이라면 U_18테스트 결과 취약 "
+        log "NOTICE" "tcp_wrappers를 사용중이라면 U_17테스트 결과 취약 "
         ((na_cnt+=1))
         na_items+=("${FUNCNAME[0]}")
         error_code=10
@@ -837,12 +837,12 @@ U_18(){
 
     if ls -alL /etc/xinetd.d/* 2>/dev/null | grep -Eiq "echo finger" ; then
         log "WARN" "finger서비스가 활성화 중입니다. "
-        log "WARN" "U_19테스트 결과 취약"
+        log "WARN" "U_18테스트 결과 취약"
         ((fail_cnt+=1))
         failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else 
-        log "INFO" "U_19테스트 결과 안전" # 단, xinetd를 사용할 경우
+        log "INFO" "U_18테스트 결과 안전" # 단, xinetd를 사용할 경우
         ((pass_cnt+=1))
 		passed_items+=("${FUNCNAME[0]}")
 
@@ -854,12 +854,12 @@ U_19(){
     echo "========== FTP 계정 유무 점검 ============"
     if cat /etc/passwd | grep -q "ftp"; then 
         log "WARN" "FTP계정이 존재합니다"
-        log "WARN" "U_20테스트 결과 취약"
+        log "WARN" "U_19테스트 결과 취약"
         ((fail_cnt+=1))
         failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else 
-        log "INFO" "U_20테스트 결과 안전"
+        log "INFO" "U_19테스트 결과 안전"
         ((pass_cnt+=1))
 		passed_items+=("${FUNCNAME[0]}")
 
@@ -872,12 +872,12 @@ U_20(){
     echo "========== r 계열 서비스 비활성화 점검 ============"
     if ls -alL /etc/xinetd.d/*  2>/dev/null | egrep "rsh|rlogin|rexec" | egrep -vq "grep|klogin|kshell|kexec"; then 
         log "WARN" "r계열 서비스가 실행중입니다."
-        log "WARN" "U_21테스트 결과 취약"
+        log "WARN" "U_20테스트 결과 취약"
         ((fail_cnt+=1))
         failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else
-        log "INFO" "U_21테스트 결과 안전"
+        log "INFO" "U_20테스트 결과 안전"
         ((pass_cnt+=1))
 		passed_items+=("${FUNCNAME[0]}")
 
@@ -952,12 +952,12 @@ U_21(){
     done 
 
     if [ $error -eq 0 ]; then 
-        log "INFO" "U_22테스트 결과 안전"
+        log "INFO" "U_21테스트 결과 안전"
         ((pass_cnt+=1))
 		passed_items+=("${FUNCNAME[0]}")
 
     else
-        log "WARN" "U_22테스트 결과 취약"
+        log "WARN" "U_21테스트 결과 취약"
         ((fail_cnt+=1))
         failed_items+=("${FUNCNAME[0]}")
         error_code=1
@@ -990,13 +990,13 @@ U_22(){
     done 
 
     if [ $error -gt 0 ]; then
-        log "WARN" "U_23테스트 결과 취약"
+        log "WARN" "U_22테스트 결과 취약"
         ((fail_cnt+=1))
         failed_items+=("${FUNCNAME[0]}")
         error_code=1
 
     else
-        log "INFO" "U_23테스트 결과 안전"
+        log "INFO" "U_22테스트 결과 안전"
         ((pass_cnt+=1))
 		passed_items+=("${FUNCNAME[0]}")
 
@@ -1024,12 +1024,12 @@ U_23(){
     done 
 
     if [ $error -gt 0 ]; then
-        log "WARN" "U_24테스트 결과 취약"
+        log "WARN" "U_23테스트 결과 취약"
         ((fail_cnt+=1))
         failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else
-        log "INFO" "U_24테스트 결과 안전"
+        log "INFO" "U_23테스트 결과 안전"
         ((pass_cnt+=1))
 		passed_items+=("${FUNCNAME[0]}")
 
@@ -1044,13 +1044,13 @@ U_24(){
     if [ -f /etc/exports ]; then 
         if grep -Eq "^[^#]*\*" /etc/exports; then 
             log "WARN" "접근권한에 *가 포함되어 있습니다. "
-            log "WARN" "U_25테스트 결과 취약"
+            log "WARN" "U_24테스트 결과 취약"
             ((fail_cnt+=1))
             failed_items+=("${FUNCNAME[0]}")
             error_code=1
             
         else 
-            log "INFO" "U_25테스트 결과 안전"
+            log "INFO" "U_24테스트 결과 안전"
             ((pass_cnt+=1))
 		    passed_items+=("${FUNCNAME[0]}")
 
@@ -1058,7 +1058,7 @@ U_24(){
         fi 
     else 
         log "NOTICE" "/etc/exports 파일이 존재하지 않습니다."
-        log "NOTICE" "U_25테스트 결과 점검불가"
+        log "NOTICE" "U_24테스트 결과 점검불가"
         ((na_cnt+=1))
         na_items+=("${FUNCNAME[0]}")
         error_code=10
@@ -1078,12 +1078,12 @@ U_25(){
 
 
     if [ $error_code -gt 0 ]; then
-        log "WARN" "U_26테스트 결과 취약"
+        log "WARN" "U_25테스트 결과 취약"
         ((fail_cnt+=1))
         failed_items+=("${FUNCNAME[0]}")
 
     else
-        log "INFO" "U_26테스트 결과 안전"
+        log "INFO" "U_25테스트 결과 안전"
         ((pass_cnt+=1))
 		passed_items+=("${FUNCNAME[0]}")
 
@@ -1125,12 +1125,12 @@ U_26(){
     done 
 
     if [ $error -gt 0 ]; then
-        log "WARN" "U_27테스트 결과 취약"
+        log "WARN" "U_26테스트 결과 취약"
         ((fail_cnt+=1))
         failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else
-        log "INFO" "U_27테스트 결과 안전"
+        log "INFO" "U_26테스트 결과 안전"
         ((pass_cnt+=1))
 		passed_items+=("${FUNCNAME[0]}")
 
@@ -1158,12 +1158,12 @@ U_27(){
     done 
 
     if [ $error -gt 0 ]; then
-        log "WARN" "U_28테스트 결과 취약"
+        log "WARN" "U_27테스트 결과 취약"
         ((fail_cnt+=1))
         failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else
-        log "INFO" "U_28테스트 결과 안전"
+        log "INFO" "U_27테스트 결과 안전"
         ((pass_cnt+=1))
 		passed_items+=("${FUNCNAME[0]}")
 
@@ -1192,12 +1192,12 @@ U_28(){
     done 
 
     if [ $error -gt 0 ]; then
-        log "WARN" "U_29테스트 결과 취약"
+        log "WARN" "U_28테스트 결과 취약"
         ((fail_cnt+=1))
         failed_items+=("${FUNCNAME[0]}")
         error_code=1
     else
-        log "INFO" "U_29테스트 결과 안전"
+        log "INFO" "U_28테스트 결과 안전"
         ((pass_cnt+=1))
 		passed_items+=("${FUNCNAME[0]}")
 
@@ -1226,7 +1226,7 @@ U_29(){
     echo "========== 스팸 메일 릴레이 제한 ============"
     if [ $(systemctl is-active sendmail.service ) = "inactive" ]; then 
         log "INFO" "sendmail 서비스 사용중이 아닙니다."
-        log "INFO" "U_31테스트 결과 안전"
+        log "INFO" "U_29테스트 결과 안전"
         ((pass_cnt+=1))
 		passed_items+=("${FUNCNAME[0]}")
 
@@ -1236,7 +1236,7 @@ U_29(){
         if [ -f /etc/mail/sendmail.cf ]; then 
             if grep -Eq "^[[:space:]]*[^#].*R\$.*550 Relaying denied" /etc/mail/sendmail.cf; then
                 log "INFO" "스팸 메일 릴레이 제한이 설정된 상태입니다."
-                log "INFO" "U_31테스트 결과 안전"
+                log "INFO" "U_29테스트 결과 안전"
                 ((pass_cnt+=1))
 		        passed_items+=("${FUNCNAME[0]}")
 
@@ -1244,7 +1244,7 @@ U_29(){
 
             else 
                 log "WARN" "스팸 메일 릴레이 제한을 설정해주세요."
-                log "WARN" "U_31테스트 결과 취약"
+                log "WARN" "U_29테스트 결과 취약"
                 ((fail_cnt+=1))
                 failed_items+=("${FUNCNAME[0]}")
                 error_code=1
@@ -1252,7 +1252,7 @@ U_29(){
 
         else 
             log "NOTICE" "/etc/mail/sendmail.cf 파일이 존재하지 않습니다."
-            log "NOTICE" "U_31테스트 점검불가"        
+            log "NOTICE" "U_29테스트 점검불가"        
             ((na_cnt+=1))
             na_items+=("${FUNCNAME[0]}")
             error_code=10
@@ -1267,7 +1267,7 @@ U_30(){
 
     if [ $(systemctl is-active sendmail.service ) = "inactive" ]; then 
             log "INFO" "sendmail 서비스 사용중이 아닙니다."
-            log "INFO" "U_32테스트 결과 안전"
+            log "INFO" "U_30테스트 결과 안전"
             ((pass_cnt+=1))
 		    passed_items+=("${FUNCNAME[0]}")
 
@@ -1276,7 +1276,7 @@ U_30(){
         if [ -f /etc/mail/sendmail.cf ]; then 
             if grep -Eq "^[[:space:]]*[^#]*PrivacyOptions[^#]*restrictqrun" /etc/mail/sendmail.cf; then
                 log "INFO" "일반 사용자의 Sendmail실행 방지가 설정되어 있습니다."
-                log "INFO" "U_32테스트 결과 안전"
+                log "INFO" "U_30테스트 결과 안전"
                 ((pass_cnt+=1))
 		        passed_items+=("${FUNCNAME[0]}")
 
@@ -1284,7 +1284,7 @@ U_30(){
 
             else 
                 log "WARN" "일반 사용자의 Sendmail실행 방지가 설정되어 있지 않습니다."
-                log "WARN" "U_32테스트 결과 취약"
+                log "WARN" "U_30테스트 결과 취약"
                 ((fail_cnt+=1))
                 failed_items+=("${FUNCNAME[0]}")
                 error_code=1
@@ -1292,7 +1292,7 @@ U_30(){
 
         else 
             log "NOTICE" "/etc/mail/sendmail.cf 파일이 존재하지 않습니다."
-            log "NOTICE" "U_32테스트 점검불가"        
+            log "NOTICE" "U_30테스트 점검불가"        
             ((na_cnt+=1))
             na_items+=("${FUNCNAME[0]}")
             error_code=10
@@ -1311,7 +1311,7 @@ U_31(){
     echo "========== DNS Zone Transfer 점검 ============"
     if [ "$(systemctl is-active named )" = "inactive" ]; then 
             log "INFO" "DNS 서비스 사용중이 아닙니다."
-            log "INFO" "U_34테스트 결과 안전"
+            log "INFO" "U_31테스트 결과 안전"
             ((pass_cnt+=1))
 		    passed_items+=("${FUNCNAME[0]}")
 
@@ -1320,13 +1320,13 @@ U_31(){
         if [ -f /etc/named.conf ]; then 
             if [ $(grep -vE "^[[:space:]]*#" /etc/named.conf | grep -i "allow-transfer"  | grep -i "any" | wc -l) -gt 0 ]; then 
                 log "WARN" "Zone Transfer를 모든 사용자에게 허용중입니다."
-                log "WARN" "U_34테스트 결과 취약 "
+                log "WARN" "U_31테스트 결과 취약 "
                 ((fail_cnt+=1))
                 failed_items+=("${FUNCNAME[0]}")
                 error_code=1
             else 
                 log "INFO" "Zone Transfer를 허가된 사용자에게만 허용중입니다."
-                log "INFO" "U_34테스트 결과 안전"
+                log "INFO" "U_31테스트 결과 안전"
                 ((pass_cnt+=1))
 		        passed_items+=("${FUNCNAME[0]}")
 
@@ -1336,7 +1336,7 @@ U_31(){
 
         else 
             log "NOTICE" "/etc/named.conf 설정파일이 존재하지 않습니다."
-            log "NOTICE" "U_34테스트 점검불가" 
+            log "NOTICE" "U_31테스트 점검불가" 
             ((na_cnt+=1))
             na_items+=("${FUNCNAME[0]}")
             error_code=10
@@ -1351,12 +1351,12 @@ U_32(){
     if [ -f /etc/httpd/conf/httpd.conf ]; then   
         if [ "$(grep -i "^[[:space:]]*[^#]*Options[^#]*Indexes" /etc/httpd/conf/httpd.conf | wc -l)" -gt 0 ]; then 
             log "WARN" "웹서비스 디렉토리 리스팅이 작동중입니다."
-            log "WARN" "U_35테스트 결과 취약 "
+            log "WARN" "U_32테스트 결과 취약 "
             ((fail_cnt+=1))
             failed_items+=("${FUNCNAME[0]}")
             error_code=1
         else
-            log "INFO" "U_35테스트 결과 안전"
+            log "INFO" "U_32테스트 결과 안전"
             ((pass_cnt+=1))
 		    passed_items+=("${FUNCNAME[0]}")
 
@@ -1364,7 +1364,7 @@ U_32(){
         fi
     else 
         log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
-        log "NOTICE" "U_35테스트 점검불가"  
+        log "NOTICE" "U_32테스트 점검불가"  
         ((na_cnt+=1))
         na_items+=("${FUNCNAME[0]}")
         error_code=10
@@ -1390,12 +1390,12 @@ U_33(){
         fi 
 
         if [ $error -gt 0 ]; then 
-            log "WARN" "U_36테스트 결과 취약 " 
+            log "WARN" "U_33테스트 결과 취약 " 
             ((fail_cnt+=1))
             failed_items+=("${FUNCNAME[0]}")
 
         else 
-            log "INFO" "U_36테스트 결과 안전"
+            log "INFO" "U_33테스트 결과 안전"
             ((pass_cnt+=1))
 		    passed_items+=("${FUNCNAME[0]}")
 
@@ -1403,7 +1403,7 @@ U_33(){
         fi 
     else 
         log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
-        log "NOTICE" "U_36테스트 점검불가"  
+        log "NOTICE" "U_33테스트 점검불가"  
         ((na_cnt+=1))
         na_items+=("${FUNCNAME[0]}")
         error_code=10
@@ -1417,19 +1417,19 @@ U_34(){
     echo "========== 웹서비스 상위 경로 이동 가능 여부 점검 ============"
     if [ -f /etc/httpd/conf/httpd.conf ]; then   
         if [ "$(grep "^[[:space:]]*AllowOverride[[:space:]]*None"  /etc/httpd/conf/httpd.conf | wc -l )" -gt 0 ]; then 
-            log "WARN" "U_37테스트 결과 취약 " 
+            log "WARN" "U_34테스트 결과 취약 " 
             ((fail_cnt+=1))
             failed_items+=("${FUNCNAME[0]}")
             error_code=1
         else 
-            log "INFO" "U_37테스트 결과 안전"
+            log "INFO" "U_34테스트 결과 안전"
             ((pass_cnt+=1))
 		    passed_items+=("${FUNCNAME[0]}")
 
         fi 
     else 
         log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
-        log "NOTICE" "U_37테스트 점검불가"  
+        log "NOTICE" "U_34테스트 점검불가"  
         ((na_cnt+=1))
         na_items+=("${FUNCNAME[0]}")
         error_code=10   
@@ -1456,11 +1456,11 @@ U_35(){
         ((error+=1))
     fi     
     if [ $error -gt 0 ]; then 
-        log "WARN" "U_38테스트 결과 취약 " 
+        log "WARN" "U_35테스트 결과 취약 " 
         ((fail_cnt+=1))
         failed_items+=("${FUNCNAME[0]}")
     else 
-        log "INFO" "U_38테스트 결과 안전"
+        log "INFO" "U_35테스트 결과 안전"
         ((pass_cnt+=1))
 		passed_items+=("${FUNCNAME[0]}")
 
@@ -1476,19 +1476,19 @@ U_36(){
         if [ "$(grep -i "^[[:space:]]*[^#]*Options[^#]*FollowSymLinks" /etc/httpd/conf/httpd.conf | wc -l)" -gt 0 ] &&
             [ "$(grep -i "^[[:space:]]*[^#]*Options[^#]*-FollowSymLinks" /etc/httpd/conf/httpd.conf | wc -l)" -eq 0 ] ; then 
             log "WARN" "심볼릭 링크, aliases가 사용 가능한 상태입니다."
-            log "WARN" "U_39테스트 결과 취약 "
+            log "WARN" "U_36테스트 결과 취약 "
             ((fail_cnt+=1))
             failed_items+=("${FUNCNAME[0]}")
             error_code=1
         else
-            log "INFO" "U_39테스트 결과 안전"
+            log "INFO" "U_36테스트 결과 안전"
             ((pass_cnt+=1))
 		    passed_items+=("${FUNCNAME[0]}")
 
         fi
     else 
         log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
-        log "NOTICE" "U_39테스트 점검불가"  
+        log "NOTICE" "U_36테스트 점검불가"  
         ((na_cnt+=1))
         na_items+=("${FUNCNAME[0]}")
         error_code=10
@@ -1505,12 +1505,12 @@ U_37(){
         if [ "$(grep -i "^[^#]*LimitRequestBody" /etc/httpd/conf/httpd.conf | wc -l )" -gt 0 ]; then 
             if [ "$(grep -i "^[^#]*LimitRequestBody" /etc/httpd/conf/httpd.conf | awk '{print $2}' | sort -nr | head -n 1)" -gt 5000000 ]; then 
                 log "NOTICE" "업로드 및 다운로드 파일이 5M 초과로 설정되어 있는 디렉토리가 존재합니다."
-                log "NOTICE" "U_40테스트 결과 주의"
+                log "NOTICE" "U_37테스트 결과 주의"
                 ((na_cnt+=1))
                 na_items+=("${FUNCNAME[0]}")
                 error_code=11
             else 
-                log "INFO" "U_40테스트 결과 안전"
+                log "INFO" "U_37테스트 결과 안전"
                 ((pass_cnt+=1))
 		        passed_items+=("${FUNCNAME[0]}")
 
@@ -1518,7 +1518,7 @@ U_37(){
             fi 
         else
             log "WARN" "LimitRequestBody가 설정되어 있지 않습니다."
-            log "WARN" "U_40테스트 결과 취약 "
+            log "WARN" "U_37테스트 결과 취약 "
             ((fail_cnt+=1))
             failed_items+=("${FUNCNAME[0]}")
             error_code=1
@@ -1526,7 +1526,7 @@ U_37(){
 
     else 
         log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
-        log "NOTICE" "U_40테스트 점검불가"  
+        log "NOTICE" "U_37테스트 점검불가"  
         ((na_cnt+=1))
         na_items+=("${FUNCNAME[0]}")
         error_code=10
@@ -1542,26 +1542,26 @@ U_38(){
             document_root="$(grep -i "^[^#]*DocumentRoot" /etc/httpd/conf/httpd.conf | awk '{gsub(/"/,"",$2); print $2}' | head -n 1)"
             if [ "$document_root" = "/usr/local/apache/htdocs" ] || [ "$document_root" = "/usr/local/apache2/htdocs" ] || [ "$document_root" = "/var/www/html" ]; then 
                 log "WARN" "DocumentRoot가 기본 디렉토리로 설정되어 있습니다."
-                log "WARN" "U_41테스트 결과 취약 "
+                log "WARN" "U_38테스트 결과 취약 "
                 ((fail_cnt+=1))
                 failed_items+=("${FUNCNAME[0]}")
                 error_code=1
             else 
-                log "INFO" "U_41테스트 결과 안전"
+                log "INFO" "U_38테스트 결과 안전"
                 ((pass_cnt+=1))
 		        passed_items+=("${FUNCNAME[0]}")
 
             fi 
         else
             log "WARN" "DocumentRoot가 설정되어 있지 않습니다."
-            log "WARN" "U_41테스트 결과 취약"
+            log "WARN" "U_38테스트 결과 취약"
             ((fail_cnt+=1))
             failed_items+=("${FUNCNAME[0]}")
             error_code=2
         fi 
     else 
         log "NOTICE" "/etc/httpd/conf/httpd.conf 설정파일이 존재하지 않습니다."
-        log "NOTICE" "U_41테스트 점검불가" 
+        log "NOTICE" "U_38테스트 점검불가" 
         ((na_cnt+=1))
         na_items+=("${FUNCNAME[0]}")
         error_code=10 
