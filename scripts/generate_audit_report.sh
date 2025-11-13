@@ -82,13 +82,14 @@ create_vuln_action_plan(){
         item=${failed_items[$idx]}
         
         write_md "## $item "
-        write_md "DEBUG: item='$item'"
+
         
 
         case $item in 
             U_02|U_10|U_13|U_14|U_22|U_23|U_24|U_27|U_28|U_29|U_38)
                 echo "특수경우 실행!"
                 error_code_len=$(echo "${error_code_dict[$item]}" | wc -w)
+                echo $error_code_len
                 subkeys=(${error_code_dict[$item]}) #문자열이니까 일단 배열로 만들어주고 쓰자.
                 for ((i=0;i<error_code_len;i++)); do 
                     write_md "$item  $subkeys[$i]"
@@ -132,3 +133,8 @@ create_vuln_action_plan
 cat $report
 
 
+
+
+# 지금 해결해야 하는것 
+# 1. 경고항목은 4출력 하는데 취약항목은 출력 안하는듯 
+# 2. 취약 항목도 출력이 이상함. 일반이상은 괜찮은데 특수경우가 출력 이상한듯 
