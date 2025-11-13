@@ -84,15 +84,13 @@ create_vuln_action_plan(){
         item=$(echo "$item" | tr -d '\r') #줄바꿈 문자 있으면 제거 
 
         write_md "## $item "
-# ⭐️ 디버깅: item 변수에 최종적으로 어떤 값이 들어가는지 확인
-        echo "⭐️ Debug Item: [$item] (Length: ${#item})"
+
         
 
         case $item in 
             U_02|U_10|U_13|U_14|U_22|U_23|U_24|U_27|U_28|U_29|U_38)
-                echo "특수경우 실행!"
+                write_md "특수경우 실행!"
                 error_code_len=$(echo "${error_code_dict[$item]}" | wc -w)
-                echo $error_code_len
                 subkeys=(${error_code_dict[$item]}) #문자열이니까 일단 배열로 만들어주고 쓰자.
                 for ((i=0;i<error_code_len;i++)); do 
                     write_md "$item  $subkeys[$i]"
