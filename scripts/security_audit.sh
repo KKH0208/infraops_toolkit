@@ -987,7 +987,7 @@ U_22(){
     for service in "${services[@]}"; do 
         if [ $(systemctl is-active $service) = "active" ]; then 
             log "WARN" "$service 서비스가 동작중입니다."
-            warning_files["U_22"]+="$file "
+            warning_files["U_22"]+="$service "
             ((error+=1))
         fi 
     done 
@@ -1122,7 +1122,7 @@ U_26(){
 
             log "WARN" "$service 서비스가 동작중입니다."
             ((error+=1))
-            warning_files["U_26"]+="$file "
+            warning_files["U_26"]+="$service "
 
         fi 
     done 
@@ -1155,7 +1155,7 @@ U_27(){
     for service in "${services[@]}"; do 
         if [ $(systemctl is-active $service) = "active" ]; then 
             log "WARN" "$service 서비스가 실행중입니다."
-            warning_files["U_27"]+="$file "
+            warning_files["U_27"]+="$service "
             ((error+=1))
         fi 
     done 
@@ -1189,7 +1189,7 @@ U_28(){
     for service in "${services[@]}"; do 
         if [ $(systemctl is-active $service) = "active" ]; then 
             log "WARN" "$service 서비스가 실행중입니다."
-            warning_files["U_28"]+="$file "
+            warning_files["U_28"]+="$service "
             ((error+=1))
         fi 
     done 

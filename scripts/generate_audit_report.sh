@@ -88,7 +88,7 @@ create_vuln_action_plan(){
         
 
         case $item in 
-            U_02|U_10|U_14|U_22|U_23|U_24|U_27|U_28|U_29|U_38)
+            U_02|U_10|U_23|U_24|U_29|U_38)
                 write_md "특수경우 실행!"
                 error_code_len=$(echo "${error_code_dict[$item]}" | wc -w)
                 write_md $error_code_len
@@ -113,22 +113,41 @@ create_vuln_action_plan(){
                 write_md "- 조치: $action"
                 write_md " "
 
-                if [ "$item" == "U_13" ]; then 
-                    write_md "SUID 혹은 SGID가 설정되어 있는 중요 파일 목록"
-                    for file in "${warning_files[@]}"; do 
-                        write_md "$file"
-                    done    
-                fi 
-                if [ "$item" == "U_13" ]; then 
-                    write_md "SUID 혹은 SGID가 설정되어 있는 중요 파일 목록"
+                if [ "$item" == "U_13" || "$item" == "U_14" || "$item" == "U_21" || "$item" == "U_22" || "$item" == "U_26" || "$item" == "U_27" || "$item" == "U_28" || "$item" == "U_35" ]; then 
+                    if [ "$item" == "U_13" ]; then 
+                        write_md "SUID 혹은 SGID가 설정되어 있는 중요 파일 목록"            
+                    elif [ "$item" == "U_14" ]; then 
+                        write_md "권한 혹은 소유자 확인이 필요한 사용자 환경파일 목록"
+                    elif [ "$item" == "U_21" ]; then 
+                        write_md "권한 혹은 소유자 확인이 필요한 crond 관련 파일 목록"
+                    elif [ "$item" == "U_22" ]; then 
+                        write_md "실행중인 DoS 공격에 취약한 서비스 목록"     
+                    elif [ "$item" == "U_26" ]; then 
+                        write_md "실행중인 RPC 관련 서비스 목록"
+                    elif [ "$item" == "U_27" ]; then 
+                        write_md "실행중인 NIS, NIS+ 관련 서비스 목록"
+                    elif [ "$item" == "U_28" ]; then 
+                        write_md "실행중인 tftp, talk 관련 서비스 목록"
+                    elif [ "$item" == "U_35" ]; then 
+                        write_md "웹서비스 불필요한 파일 목록"
+                    fi 
 
                     # 연관 배열에서 값을 가져와서, 공백을 기준으로 배열로 분리
                     local files_to_print=(${warning_files[U_13]}) 
-                    
+
                     for file in "${files_to_print[@]}"; do 
                         write_md "$file"
                     done 
                 fi
+
+13 14 21 22 26 27 28 35
+
+
+
+
+
+
+                write_md " "
                 ;;
         esac
 
