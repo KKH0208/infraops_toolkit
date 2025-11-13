@@ -91,6 +91,7 @@ create_vuln_action_plan(){
             U_02|U_10|U_13|U_14|U_22|U_23|U_24|U_27|U_28|U_29|U_38)
                 write_md "특수경우 실행!"
                 error_code_len=$(echo "${error_code_dict[$item]}" | wc -w)
+                write_md $error_code_len
                 subkeys=(${error_code_dict[$item]}) #문자열이니까 일단 배열로 만들어주고 쓰자.
                 for ((i=0;i<error_code_len;i++)); do 
                     write_md "$item  $subkeys[$i]"
