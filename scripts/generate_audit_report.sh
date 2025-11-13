@@ -74,8 +74,6 @@ create_vuln_action_plan(){
     write_md "## 4. 취약 항목 요약 및 조치"
 
 
-
-    
     for idx in "${!failed_items[@]}";do
         item=${failed_items[$idx]}
         item=$(echo "$item" | xargs) # 양끝 공백 있으면 제거 
