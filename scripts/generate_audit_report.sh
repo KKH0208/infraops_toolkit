@@ -84,7 +84,8 @@ create_vuln_action_plan(){
         item=$(echo "$item" | tr -d '\r') #줄바꿈 문자 있으면 제거 
 
         write_md "## $item "
-
+# ⭐️ 디버깅: item 변수에 최종적으로 어떤 값이 들어가는지 확인
+        echo "⭐️ Debug Item: [$item] (Length: ${#item})"
         
 
         case $item in 
