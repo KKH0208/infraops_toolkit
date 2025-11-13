@@ -1627,7 +1627,7 @@ for num in {0..38}; do
                     ;;
                 *)
                     error_code_list+=("$error_code")
-                    echo "에러코드리스트 추가 qjsgh $num"
+                    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!에러코드리스트 추가 qjsgh $num"
                     ;;
             esac
         fi 
