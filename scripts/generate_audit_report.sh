@@ -80,7 +80,9 @@ create_vuln_action_plan(){
     
     for idx in "${!failed_items[@]}";do
         item=${failed_items[$idx]}
-        
+        item=$(echo "$item" | xargs) # 양끝 공백 있으면 제거 
+        item=$(echo "$item" | tr -d '\r') #줄바꿈 문자 있으면 제거 
+
         write_md "## $item "
 
         
