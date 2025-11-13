@@ -48,8 +48,8 @@ create_audit_result_summary() {
     write_md "| 점검 결과 | 건수 | 상세 항목 |"
     write_md "|-----------|------|-----------|"
     write_md "| 안전      | ${pass_cnt}건  | ${passed_items[*]} |"
-    write_md "| 경고      | ${fail_cnt}건  | ${failed_items[*]} |"
-    write_md "| 취약      | ${na_cnt}건  | ${na_items[*]}      |"
+    write_md "| 경고      | ${na_cnt}건  | ${na_items[*]} |"
+    write_md "| 취약      | ${fail_cnt}건  | ${failed_items[*]} |"
     write_md " "
 }
 
@@ -73,9 +73,7 @@ create_audit_result_detail(){
 create_vuln_action_plan(){
     write_md "## 4. 취약 항목 요약 및 조치"
 
-    for key in "${!error_code_dict[@]}"; do
-        write_md "$key → ${error_code_dict[$key]}"
-    done
+
 
     
     for idx in "${!failed_items[@]}";do
@@ -89,6 +87,7 @@ create_vuln_action_plan(){
 
         case $item in 
             U_02|U_10|U_23|U_24|U_29|U_38)
+                
                 write_md "특수경우 실행!"
                 error_code_len=$(echo "${error_code_dict[$item]}" | wc -w)
                 write_md $error_code_len

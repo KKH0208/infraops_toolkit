@@ -1624,6 +1624,7 @@ for num in {0..38}; do
                         fi 
                     done 
                     error_code_dict["$func_name"]="${error_codes[*]}" 
+                    error_code_list+=("$error_code")
                     ;;
                 *)
                     error_code_list+=("$error_code")
