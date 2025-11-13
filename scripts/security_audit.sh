@@ -11,8 +11,8 @@ pass_cnt=0
 fail_cnt=0
 na_cnt=0
 
-error_code=0
-error_code_array=(0 0 0 0 0 0 0 0 0 0 0 0) 
+error_code=0 # 에러코드가 한가지 경우의 수만 존재할 경우 
+error_code_array=(0 0 0 0 0 0 0 0 0 0 0 0) # 에러 코드가 복수가 가능할 경우 
 warning_files=()
 audit_result=()
 error_code_list=()      # 얘가 일반경우일때의 에러코드를 보관하는 애들, 어차피 에러코드는 하나일테니 
@@ -305,7 +305,7 @@ U_05(){
 
     fi 
 
-    error_code_array=(0 0 0 0 0)
+
 
 }
 
@@ -1575,6 +1575,7 @@ U_38(){
 load_config
 
 for num in {0..38}; do 
+
     func_name="U_$(printf '%02d' "$num")"
     error_code=0
 
@@ -1587,9 +1588,10 @@ for num in {0..38}; do
             done
             ;;
 
-        # 6)
-        #     continue
-        #     ;;
+        #이건 테스트때만 잠깐 해놓자 
+        6)
+            continue
+            ;;
 
         *)
             ;;
