@@ -13,7 +13,7 @@ na_cnt=0
 
 error_code=0 # 에러코드가 한가지 경우의 수만 존재할 경우 
 error_code_array=(0 0 0 0 0 0 0 0 0 0 0 0) # 에러 코드가 복수가 가능할 경우 
-warning_files=()
+declare -A warning_files # 얘도 키가 U_01이면 값이 (1 2 3) 이런식으로
 audit_result=()
 error_code_list=()      # 얘가 일반경우일때의 에러코드를 보관하는 애들, 어차피 에러코드는 하나일테니 
 declare -A error_code_dict  #얘가 복잡할 경우. 키가 U_01이면 값이 (1 2 3) 이런식으로 경우에 대해 출력해야하는 모든 에러코드가 존재
@@ -664,13 +664,14 @@ U_13(){
             log "NOTICE" "$file 파일이 존재하지 않습니다."
         else 
             if ls -alL $file | awk '{print $1}' | grep -Eq '[sS]|[gG]'; then 
-                warning_files+=("$file") 
+                warning_files["U_13"]+="$file " 
             fi 
         fi 
 
     done 
 
-    if [ ${#warning_files[@]} -gt 0 ]; then 
+
+    if [ -n "${warning_files["U_13"]}" ]; then 
         for file in "${warning_files[@]}"; do 
             echo "SUID 혹은 SGID가 설정된 파일: $file"
         done 
@@ -718,13 +719,13 @@ U_14(){
             file_owner=$(ls -al /home/"$user"/"$file" | awk '{print $3}') 
             if [ $file_owner != "root" ] && [ $file_owner != "$user" ]; then 
                 log "WARN" "/home/"$user"/"$file" 파일 소유자를 확인해주세요"
-                warning_files+=("$file") 
+                warning_files["U_14"]+="$file "
                 ((error+=1))
             else
                 check=$(find "/home/"$user"/"$file"" -type f -perm /0022 | wc -l)
                 if [ $check -eq 1 ]; then 
                     log "WARN" "/home/"$user"/"$file" 파일의 그룹 혹은 아더가 쓰기 기능을 갖고 있습니다"
-                    warning_files+=("$file") 
+                    warning_files["U_14"]+="$file " 
                     ((error+=1))
 
                     continue
@@ -912,7 +913,7 @@ U_21(){
                 check=$(find $file -type f -perm /0137 | wc -l )
                 if [ $check -gt 0 ]; then 
                     log "WARN" "$file 파일의 권한이 너무 큽니다."
-                    warning_files+=("$file")
+                    warning_files["U_21"]+="$file "
                     ((error+=1))
                     else
                     file_owner=$(ls -l $file | awk '{print $3}')
@@ -920,7 +921,7 @@ U_21(){
                         log "INFO" "$file 파일 테스트 결과 양호"
                     else
                         log "WARN" "$file 파일 소유자가 root가 아닙니다."
-                        warning_files+=("$file")
+                        warning_files["U_21"]+="$file "
                         ((error+=1))
 
                     fi 
@@ -931,7 +932,7 @@ U_21(){
                      check=$(find $sub_file -type f -perm /0137 | wc -l )
                         if [ $check -gt 0 ]; then 
                             log "WARN" "$sub_file 파일의 권한이 너무 큽니다."
-                            warning_files+=("$file")
+                            warning_files["U_21"]+="$file "
                             ((error+=1))
 
                         else
@@ -940,7 +941,7 @@ U_21(){
                                 log "INFO" "$sub_file 파일 테스트 결과 양호"
                             else
                                 log "WARN" "$sub_file 파일 소유자가 root가 아닙니다."
-                                warning_files+=("$file")
+                                warning_files["U_21"]+="$file "
                                 ((error+=1))
 
                             fi 
@@ -986,7 +987,7 @@ U_22(){
     for service in "${services[@]}"; do 
         if [ $(systemctl is-active $service) = "active" ]; then 
             log "WARN" "$service 서비스가 동작중입니다."
-            warning_files+=("$service")
+            warning_files["U_22"]+="$file "
             ((error+=1))
         fi 
     done 
@@ -1020,7 +1021,7 @@ U_23(){
     for service in "${services[@]}"; do 
         if [ $(systemctl is-active $service) = "active" ]; then 
             log "WARN" "$service 서비스가 동작중입니다."
-            warning_files+=("$service")
+            warning_files["U_23"]+="$file "
             ((error+=1))
         fi 
     done 
@@ -1121,7 +1122,7 @@ U_26(){
 
             log "WARN" "$service 서비스가 동작중입니다."
             ((error+=1))
-            warning_files+=("$service")
+            warning_files["U_26"]+="$file "
 
         fi 
     done 
@@ -1154,7 +1155,7 @@ U_27(){
     for service in "${services[@]}"; do 
         if [ $(systemctl is-active $service) = "active" ]; then 
             log "WARN" "$service 서비스가 실행중입니다."
-            warning_files+=("$service")
+            warning_files["U_27"]+="$file "
             ((error+=1))
         fi 
     done 
@@ -1188,7 +1189,7 @@ U_28(){
     for service in "${services[@]}"; do 
         if [ $(systemctl is-active $service) = "active" ]; then 
             log "WARN" "$service 서비스가 실행중입니다."
-            warning_files+=("$service")
+            warning_files["U_28"]+="$file "
             ((error+=1))
         fi 
     done 
@@ -1448,12 +1449,12 @@ U_35(){
     if [ -d /usr/share/httpd/htdocs/manual ]; then 
         log "WARN" "/usr/share/httpd/htdocs/manual 디렉터리가 존재합니다."
         error_code=1
-        warning_files+=(/usr/share/httpd/htdocs/manual)
+        warning_files["U_35"]+="/usr/share/httpd/htdocs/manual "
         ((error+=1))
     fi 
     if [ -d /usr/share/httpd/manual ]; then 
         log "WARN" "/usr/share/httpd/manual 디렉터리가 존재합니다."
-        warning_files+=(/usr/share/httpd/manual)
+        warning_files["U_35"]+="/usr/share/httpd/manual "
         error_code=2
         ((error+=1))
     fi     
@@ -1584,7 +1585,6 @@ for num in {0..38}; do
     # 밑에 초기화 전에 워닝파일을 활용해야 하는디..
     case $num in 
         2|10|13|14|21|22|23|26|27|28|35)
-            warning_files=()
             for j in "${!error_code_array[@]}"; do
                 error_code_array[$j]=0
             done
