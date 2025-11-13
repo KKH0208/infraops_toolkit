@@ -207,6 +207,7 @@ U_02(){
     else 
         log "WARN" "pwquality.conf 파일이 없습니다."
         error_code_array[10]=1
+        error_code=10
     fi
 
     if [ $error_code -eq 0 ]; then 
@@ -495,10 +496,12 @@ U_10(){
             else
                 log "WARN" "/etc/xinetd.conf 파일의 소유자가 root가 아닙니다"
                 error_code_array[1]=1
+                error_code=1
             fi 
         else 
             log "WARN" "/etc/xinetd.conf 파일의 권한이 600이 아닙니다."
             error_code_array[2]=1
+            error_code=2
 
         fi 
 
@@ -1618,10 +1621,11 @@ for num in {0..38}; do
         #에러코드 모아놔서 레포트 4에 쓰기 위해
         # error_code_array를 순회하면서 1이면 그때의 인덱스를 error_code_dict에 저장하는거지
 
+        #우리가 결국 보고서 4에 출력할 놈들은 에러코드가 1~9 사이인 놈이니까 
         if [ $error_code -ne 0 ]; then 
             if [ $error_code -lt 10 ]; then 
                 error_code_list+=("$error_code")
-
+                echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!에러코드리스트 추가 qjsgh $num"
             case $num in
                 2|10|35|38)
                     error_codes=()
@@ -1632,10 +1636,6 @@ for num in {0..38}; do
                     done 
                     error_code_dict["$func_name"]="${error_codes[*]}" 
 
-                    ;;
-                *)
-
-                    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!에러코드리스트 추가 qjsgh $num"
                     ;;
             esac
             fi
