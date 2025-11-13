@@ -88,6 +88,8 @@ check_password_quality(){
         fi 
     else 
         log "WARN" "${key}이 설정되지 않았습니다"
+            error_code_array[$index]=1
+            ((error_code+=1)) 
     fi 
 
 }
