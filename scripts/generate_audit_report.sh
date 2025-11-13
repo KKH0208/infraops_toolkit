@@ -88,13 +88,13 @@ create_vuln_action_plan(){
         
 
         case $item in 
-            U_02|U_10|U_13|U_14|U_22|U_23|U_24|U_27|U_28|U_29|U_38)
+            U_02|U_10|U_14|U_22|U_23|U_24|U_27|U_28|U_29|U_38)
                 write_md "특수경우 실행!"
                 error_code_len=$(echo "${error_code_dict[$item]}" | wc -w)
                 write_md $error_code_len
                 subkeys=(${error_code_dict[$item]}) #문자열이니까 일단 배열로 만들어주고 쓰자.
                 for ((i=0;i<error_code_len;i++)); do 
-                    write_md "$item  $subkeys[$i]"
+                    # write_md "$item  $subkeys[$i]"
                     desc=$(jq -r --arg k "$item" --arg sk "${subkeys[$i]}" '.[$k][$sk].desc' "$json_file")
                     action=$(jq -r --arg k "$item" --arg sk "${subkeys[$i]}" '.[$k][$sk].action // ""' "$json_file")
                     write_md "- 상황: $desc"
@@ -103,6 +103,7 @@ create_vuln_action_plan(){
 
                 done 
                 ;;
+
             *)
                 write_md "일반경우 실행!"
                 subkey=${error_code_list[$idx]}
@@ -111,6 +112,14 @@ create_vuln_action_plan(){
                 write_md "- 상황: $desc"
                 write_md "- 조치: $action"
                 write_md " "
+
+                if [ "$item" == "U_13" ]; then 
+                    write_md "SUID 혹은 SGID가 설정되어 있는 중요 파일 목록"
+                    for file in "${warning_files[@]}"; do 
+                        write_md "$file"
+                    done    
+                fi 
+                
                 ;;
         esac
 
