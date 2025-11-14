@@ -17,6 +17,9 @@ report="report_${TIMESTAMP}.md"
 source ./security_audit.sh
 csv_file="../config/data_for_report.csv"
 json_file="../config/error_code_table.json"
+pass_ratio=$(echo "scale=2; ($pass_cnt / 39 ) * 100" | bc)
+na_ratio=$(echo "scale=2; ($na_cnt / 39 ) * 100" | bc)
+fail_ratio=$(echo "scale=2; ($fail_cnt / 39 ) * 100" | bc)
 
 #========== 함수 ============
 
@@ -27,7 +30,6 @@ write_md(){
 
 create_header() {
     write_md "# 서버 보안 감사 보고서"
-    write_md "***"
     write_md "**작성일:** $(date '+%y-%m-%d')"
     write_md "**점검 대상:** EC2 Apache 서버 (IP: 192.168.0.1)"
     write_md "**작성자:** ${USER}"
@@ -35,21 +37,37 @@ create_header() {
 }
 
 create_audit_purpose() {
-    write_md "## 1. 서버 보안 감사 목적"
-    write_md "본 부서에서 관리하는 50대의 리눅스 서버에 대해 보안관리가 제대로 이루어지고 있는지 점검하는 것을 목적으로 한다."
+    write_md "## 1. 개요"
+    write_md "본 보고서는 부서에서 관리하는 리눅스 서버에 대해 보안관리가 제대로 이루어지고 있는지 점검하는 것을 목적으로 한다."
     write_md " "
+    write_md "### 점검 범위"
+    write_md "* 사용자 계정 상태 관리"
+    write_md "* 주요 파일 권한 및 소유자 점검 "
+    write_md "* 위험 서비스 동작 유무 점검 "
+    write_md "* 주요 서비스 환경설정파일 점검 "
+    write_md "* 기타 보안 점검 "
+
 }
+
+| 구분 | 등급 | 발견 건수 | 비율 | 대표 취약점 코드 | 세부 내용 | 
+ | ----- | ----- | ----- | ----- | ----- | ----- | 
+| **점검 결과** | 안전 | 25건 | 64.1% | U_02, U_10 | 비밀번호 복잡성, 계정 잠금 미설정 | 
+|  | 취약 | 10건 | 25.6% | U_12, U_15 | 불필요한 파일 권한, 서비스 설정 오류 | 
+|  | 양호 | 4건 | 10.3% | U_01, U_20 | 계정 관리 양호, 보안 패치 최신화 | 
+| **총계** | \- | **39건** | **100%** | \- | \- |
 
 
 # 건수 저장하는 변수랑 상세 항목 저장하는 배열 필요함 
 create_audit_result_summary() {
     write_md "## 2. 점검 결과 요약"
     write_md ""
-    write_md "| 점검 결과 | 건수 | 상세 항목 |"
-    write_md "|-----------|------|-----------|"
-    write_md "| 안전      | ${pass_cnt}건  | ${passed_items[*]} |"
-    write_md "| 경고      | ${na_cnt}건  | ${na_items[*]} |"
-    write_md "| 취약      | ${fail_cnt}건  | ${failed_items[*]} |"
+    write_md "| 구분 | 등급 | 발견건수 | 비율 | 상세 항목 |"
+    write_md "| ----- | ----- | ----- | ----- | ----- |"
+    write_md "| 점검결과 | 안전  | ${pass_cnt}건  | ${pass_ratio}%   | ${passed_items[*]} |"
+    write_md "|   | 경고  | ${na_cnt}건 | ${na_ratio}% | ${na_items[*]} |"
+    write_md "|   | 취약  | ${fail_cnt}건 | ${fail_ratio}% | ${failed_items[*]} |"
+    write_md "| 총계 | - | 39건 | 100% | - |"
+
     write_md " "
 }
 
@@ -58,11 +76,16 @@ create_audit_result_detail(){
     while IFS=',' read -r no title check_criteria pass fail na
     do 
         write_md "### U-$no $title"
-        write_md "점검 기준 : $check_criteria"
-        write_md "양호 : $pass"
-        write_md "경고 : $na"
-        write_md "취약 : $fail"
-        write_md "점검 결과 : ${audit_result[$no]}"
+        write_md "#### 점검 기준"
+        write_md "$check_criteria"
+        write_md "#### 양호"
+        write_md "$pass"
+        write_md "#### 경고"
+        write_md "$na"
+        write_md "#### 취약"
+        write_md "$fail"
+        write_md "#### 점검 결과"
+        write_md "${audit_result[$no]}"
         write_md " "
 
     done < "$csv_file"
@@ -72,7 +95,7 @@ create_audit_result_detail(){
 
 create_vuln_action_plan(){
     write_md "## 4. 취약 항목 요약 및 조치"
-
+    write_md "다음은 점검 결과가 취약인 항목에 대한 현황 보고와 권장 조치 방안입니다."
 
     for idx in "${!failed_items[@]}";do
         item=${failed_items[$idx]}
@@ -85,58 +108,58 @@ create_vuln_action_plan(){
 
         case $item in 
             U_02|U_10|U_35|U_38)
-
-                write_md "특수경우 실행!"
                 error_code_len=$(echo "${error_code_dict[$item]}" | wc -w)
-                write_md $error_code_len
                 subkeys=(${error_code_dict[$item]}) #문자열이니까 일단 배열로 만들어주고 쓰자.
                 for ((i=0;i<error_code_len;i++)); do 
                     # write_md "$item  $subkeys[$i]"
                     desc=$(jq -r --arg k "$item" --arg sk "${subkeys[$i]}" '.[$k][$sk].desc' "$json_file")
                     action=$(jq -r --arg k "$item" --arg sk "${subkeys[$i]}" '.[$k][$sk].action // ""' "$json_file")
-                    write_md "- 상황: $desc"
-                    write_md "- 조치: $action"
+                    write_md "#### 현황"
+                    write_md "$desc"
+                    write_md "#### 조치"
+                    write_md "$action"
                     write_md " "
 
                 done 
                 ;;
 
             *)
-                write_md "일반경우 실행!"
                 subkey=${error_code_list[$idx]}
                 desc=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].desc' "$json_file")
                 action=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].action // ""' "$json_file")
-                write_md "- 상황: $desc"
-                write_md "- 조치: $action"
+                write_md "#### 현황"
+                write_md "$desc"
+                write_md "#### 조치"
+                write_md "$action"
                 write_md " "
 
                 if [[ "$item" == "U_13" || "$item" == "U_14" || "$item" == "U_21" || "$item" == "U_22" || "$item" == "U_23" || "$item" == "U_26" || "$item" == "U_27" || "$item" == "U_28" || "$item" == "U_35" ]]; then 
                     if [ "$item" == "U_13" ]; then 
-                        write_md "SUID 혹은 SGID가 설정되어 있는 중요 파일 목록"  
+                        write_md "#### SUID 혹은 SGID가 설정되어 있는 중요 파일 목록"  
                         local files_to_print=(${warning_files[U_13]})          
                     elif [ "$item" == "U_14" ]; then 
-                        write_md "권한 혹은 소유자 확인이 필요한 사용자 환경파일 목록"
+                        write_md "#### 권한 혹은 소유자 확인이 필요한 사용자 환경파일 목록"
                         local files_to_print=(${warning_files[U_14]})
                     elif [ "$item" == "U_21" ]; then 
-                        write_md "권한 혹은 소유자 확인이 필요한 crond 관련 파일 목록"
+                        write_md "#### 권한 혹은 소유자 확인이 필요한 crond 관련 파일 목록"
                         local files_to_print=(${warning_files[U_21]})
                     elif [ "$item" == "U_22" ]; then 
-                        write_md "실행중인 DoS 공격에 취약한 서비스 목록"     
+                        write_md "#### 실행중인 DoS 공격에 취약한 서비스 목록"     
                         local files_to_print=(${warning_files[U_22]})
                     elif [ "$item" == "U_23" ]; then 
-                        write_md "실행중인 NFS 관련 서비스 목록"     
+                        write_md "#### 실행중인 NFS 관련 서비스 목록"     
                         local files_to_print=(${warning_files[U_23]})                        
                     elif [ "$item" == "U_26" ]; then 
-                        write_md "실행중인 RPC 관련 서비스 목록"
+                        write_md "#### 실행중인 RPC 관련 서비스 목록"
                         local files_to_print=(${warning_files[U_26]})
                     elif [ "$item" == "U_27" ]; then 
-                        write_md "실행중인 NIS, NIS+ 관련 서비스 목록"
+                        write_md "#### 실행중인 NIS, NIS+ 관련 서비스 목록"
                         local files_to_print=(${warning_files[U_27]})
                     elif [ "$item" == "U_28" ]; then 
-                        write_md "실행중인 tftp, talk 관련 서비스 목록"
+                        write_md "#### 실행중인 tftp, talk 관련 서비스 목록"
                         local files_to_print=(${warning_files[U_28]})
                     elif [ "$item" == "U_35" ]; then 
-                        write_md "웹서비스 불필요한 파일 목록"
+                        write_md "#### 웹서비스 불필요한 파일 목록"
                         local files_to_print=(${warning_files[U_35]})
                     fi 
 
@@ -144,7 +167,7 @@ create_vuln_action_plan(){
 
 
                     for file in "${files_to_print[@]}"; do 
-                        write_md "$file"
+                        write_md "`$file`"
                     done 
                 fi
 
