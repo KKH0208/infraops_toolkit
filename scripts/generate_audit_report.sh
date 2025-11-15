@@ -25,6 +25,7 @@ fail_ratio=$(echo "scale=2; 100 - $pass_ratio - $na_ratio" | bc)
 
 write_md(){
     echo "$1<br>" >> $report
+    echo "  " >> $report
 }
 
 
