@@ -88,14 +88,14 @@ create_audit_purpose() {
 
 # 건수 저장하는 변수랑 상세 항목 저장하는 배열 필요함 
 create_audit_result_summary() {
-# cat << EOF2 대신 cat <<- EOF2 를 사용 (탭 무시)
+# 탭 들여쓰기를 무시하도록 <<- EOF2 사용
     cat <<- EOF2 >> "$report" 
 \begin{center}
 \begin{tabular}{|p{1.5cm}|p{1cm}|p{2cm}|p{1.5cm}|p{8cm}|} 
 \hline
-\textbf{구분} & \textbf{등급} & \textbf{발견건수} & \textbf{비율} & \textbf{상세 항목} \\ 
-\hline  # <-- \textbf{상세 항목} 뒤에 누락되었던 \\ 가 자동으로 들어간 후 \hline가 와야 합니다.
-점검결과 & 안전 & 25건 & 64.00\% & U\_01, U\_04, U\_05, U\_06, U\_07, U\_08, U\_11, U\_12, U\_14, U\_16, U\_18, U\_20, U\_22, U\_23, U\_24, U\_25, U\_26, U\_27, U\_28, U\_29, U\_30, U\_31, U\_33, U\_35, U\_37 \\ 
+\textbf{구분} & \textbf{등급} & \textbf{발견건수} & \textbf{비율} & \textbf{상세 항목} \\
+\hline
+점검결과 & 안전 & 25건 & 64.00\% & U\_01, U\_04, U\_05, U\_06, U\_07, U\_08, U\_11, U\_12, U\_14, U\_16, U\_18, U\_20, U\_22, U\_23, U\_24, U\_25, U\_26, U\_27, U\_28, U\_29, U\_30, U\_31, U\_33, U\_35, U\_37 \\
 \hline
 & 경고 & 2건 & 5.00\% & U\_10, U\_17 \\
 \hline
