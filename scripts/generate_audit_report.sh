@@ -35,7 +35,7 @@ write_md(){
 
 create_header() {
 
-    cat << EOF > "$$report"
+    cat << EOF > "$report"
 ---
 title: "서버 보안 감사 보고서"
 author: "**작성자:** ${USER}"
