@@ -75,15 +75,15 @@ create_audit_result_detail(){
     do 
         write_md ">### U-$no $title"
         write_md "* 점검 기준"
-        write_md "+ $check_criteria"
+        write_md "  + $check_criteria"
         write_md "* 양호"
-        write_md "+ $pass"
+        write_md "  + $pass"
         write_md "* 경고"
-        write_md "+ $na"
+        write_md "  + $na"
         write_md "* 취약"
-        write_md "+ $fail"
+        write_md "  + $fail"
         write_md "* 점검 결과"
-        write_md "+ ${audit_result[$no]}"
+        write_md "  + ${audit_result[$no]}"
         echo " --- " >> $report
 
     done < "$csv_file"
@@ -113,9 +113,9 @@ create_vuln_action_plan(){
                     desc=$(jq -r --arg k "$item" --arg sk "${subkeys[$i]}" '.[$k][$sk].desc' "$json_file")
                     action=$(jq -r --arg k "$item" --arg sk "${subkeys[$i]}" '.[$k][$sk].action // ""' "$json_file")
                     write_md "* 현황"
-                    write_md "+ $desc"
+                    write_md "  + $desc"
                     write_md "* 조치"
-                    write_md "+ $action"
+                    write_md "  + $action"
                     echo " " >>$report
 
 
@@ -127,9 +127,9 @@ create_vuln_action_plan(){
                 desc=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].desc' "$json_file")
                 action=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].action // ""' "$json_file")
                 write_md "* 현황"
-                write_md "+ $desc"
+                write_md "  + $desc"
                 write_md "* 조치"
-                write_md "+ $action"
+                write_md "  + $action"
                 echo " " >>$report
 
                 if [[ "$item" == "U_13" || "$item" == "U_14" || "$item" == "U_21" || "$item" == "U_22" || "$item" == "U_23" || "$item" == "U_26" || "$item" == "U_27" || "$item" == "U_28" || "$item" == "U_35" ]]; then 
@@ -166,7 +166,7 @@ create_vuln_action_plan(){
 
 
                     for file in "${files_to_print[@]}"; do 
-                        write_md "$file"
+                        write_md "* $file"
                     done 
                 fi
 
