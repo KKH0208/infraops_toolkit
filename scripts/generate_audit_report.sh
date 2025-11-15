@@ -92,7 +92,7 @@ cat << EOF2 >> "$report" # EOF2는 새로운 구분자
 \begin{center}
 \begin{tabular}{|p{1.5cm}|p{1cm}|p{2cm}|p{1.5cm}|p{8cm}|} % p{너비}를 사용하여 각 열의 폭을 고정
 \hline
-\rowfont{\bfseries} 구분 & 등급 & 발견건수 & 비율 & 상세 항목 \\
+{\bfseries} 구분 & 등급 & 발견건수 & 비율 & 상세 항목 \\
 \hline
 점검결과 & 안전 & 25건 & 64.00\% & U\_01, U\_04, U\_05, U\_06, U\_07, U\_08, U\_11, U\_12, U\_14, U\_16, U\_18, U\_20, U\_22, U\_23, U\_24, U\_25, U\_26, U\_27, U\_28, U\_29, U\_30, U\_31, U\_33, U\_35, U\_37 \\
 \hline
@@ -100,7 +100,7 @@ cat << EOF2 >> "$report" # EOF2는 새로운 구분자
 \hline
 & 취약 & 12건 & 31.00\% & U\_00, U\_02, U\_03, U\_09, U\_13, U\_15, U\_19, U\_21, U\_32, U\_34, U\_36, U\_38 \\
 \hline
-\rowfont{\bfseries} 총계 & & 39건 & 100\% & - \\
+{\bfseries} 총계 & & 39건 & 100\% & - \\
 \hline
 \end{tabular}
 \end{center}
