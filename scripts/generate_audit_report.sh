@@ -73,17 +73,17 @@ create_audit_result_detail(){
     write_md "39가지 보안 점검 사항에 대해 평가기준(양호, 경고, 취약)을 정의하고, 이를 기반으로 수행된 최종 점검 결과를 표시한다"
     while IFS=',' read -r no title check_criteria pass fail na
     do 
-        write_md "### U-$no $title"
-        write_md "#### 점검 기준"
-        write_md "* $check_criteria"
-        write_md "#### 양호"
-        write_md "* $pass"
-        write_md "#### 경고"
-        write_md "* $na"
-        write_md "#### 취약"
-        write_md "* $fail"
-        write_md "#### 점검 결과"
-        write_md "* ${audit_result[$no]}"
+        write_md ">### U-$no $title"
+        write_md "* 점검 기준"
+        write_md "+ $check_criteria"
+        write_md "* 양호"
+        write_md "+ $pass"
+        write_md "* 경고"
+        write_md "+ $na"
+        write_md "* 취약"
+        write_md "+ $fail"
+        write_md "* 점검 결과"
+        write_md "+ ${audit_result[$no]}"
         echo " --- " >> $report
 
     done < "$csv_file"
@@ -100,7 +100,7 @@ create_vuln_action_plan(){
         item=$(echo "$item" | xargs) # 양끝 공백 있으면 제거 
         item=$(echo "$item" | tr -d '\r') #줄바꿈 문자 있으면 제거 
 
-        write_md "## $item "
+        write_md ">## $item "
 
         
 
@@ -112,10 +112,10 @@ create_vuln_action_plan(){
                     # write_md "$item  $subkeys[$i]"
                     desc=$(jq -r --arg k "$item" --arg sk "${subkeys[$i]}" '.[$k][$sk].desc' "$json_file")
                     action=$(jq -r --arg k "$item" --arg sk "${subkeys[$i]}" '.[$k][$sk].action // ""' "$json_file")
-                    write_md "#### 현황"
-                    write_md "* $desc"
-                    write_md "#### 조치"
-                    write_md "* $action"
+                    write_md "* 현황"
+                    write_md "+ $desc"
+                    write_md "* 조치"
+                    write_md "+ $action"
                     echo " " >>$report
 
 
@@ -126,10 +126,10 @@ create_vuln_action_plan(){
                 subkey=${error_code_list[$idx]}
                 desc=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].desc' "$json_file")
                 action=$(jq -r --arg k "$item" --arg sk "$subkey" '.[$k][$sk].action // ""' "$json_file")
-                write_md "#### 현황"
-                write_md "* $desc"
-                write_md "#### 조치"
-                write_md "* $action"
+                write_md "* 현황"
+                write_md "+ $desc"
+                write_md "* 조치"
+                write_md "+ $action"
                 echo " " >>$report
 
                 if [[ "$item" == "U_13" || "$item" == "U_14" || "$item" == "U_21" || "$item" == "U_22" || "$item" == "U_23" || "$item" == "U_26" || "$item" == "U_27" || "$item" == "U_28" || "$item" == "U_35" ]]; then 
