@@ -84,24 +84,34 @@ create_audit_purpose() {
 
 }
 
+# 쉘 변수(배열 내용)의 모든 언더바를 LaTeX 이스케이프 문법(\_)으로 치환하는 함수
+escape_for_latex() {
+    # 입력받은 문자열의 모든 "_"를 "\_"로 치환
+    echo "$*" | sed 's/_/\\_/g'
+}
 
-
-# 건수 저장하는 변수랑 상세 항목 저장하는 배열 필요함 
 create_audit_result_summary() {
+    # 1. 배열 내용을 LaTeX용으로 이스케이프
+    ESCAPED_PASSED_ITEMS=$(escape_for_latex "${passed_items[*]}")
+    ESCAPED_NA_ITEMS=$(escape_for_latex "${na_items[*]}")
+    ESCAPED_FAILED_ITEMS=$(escape_for_latex "${failed_items[*]}")
 
-    write_md "# 2. 점검 결과 요약"
-    echo " " >>$report
+    # write_md 함수가 "# 2. 점검 결과 요약"을 파일에 쓰는 역할이라고 가정합니다.
+    write_md "# 2. 점검 결과 요약" 
+    echo " " >>$report # 빈 줄 추가
+    
+    # 2. 이스케이프된 변수를 표에 사용
     cat <<- EOF2 >> "$report" 
 \begin{center}
 \begin{tabular}{|p{1.5cm}|p{1cm}|p{2cm}|p{1.5cm}|p{8cm}|} 
 \hline
 \textbf{구분} & \textbf{등급} & \textbf{발견건수} & \textbf{비율} & \textbf{상세 항목} \\\\
 \hline
-점검결과 & 안전 & ${pass_cnt}건 & ${pass_ratio}\% & ${passed_items[*]} \\\\
+점검결과 & 안전 & ${pass_cnt}건 & ${pass_ratio}\% & ${ESCAPED_PASSED_ITEMS} \\\\
 \hline
-& 경고 & ${na_cnt}건 & ${na_ratio}\% & ${na_items[*]} \\\\
+& 경고 & ${na_cnt}건 & ${na_ratio}\% & ${ESCAPED_NA_ITEMS} \\\\
 \hline
-& 취약 & ${fail_cnt}건 & ${fail_ratio}\% &${failed_items[*]} \\\\
+& 취약 & ${fail_cnt}건 & ${fail_ratio}\% & ${ESCAPED_FAILED_ITEMS} \\\\
 \hline
 \textbf{총계} & & 39건 & 100\% & - \\\\
 \hline
