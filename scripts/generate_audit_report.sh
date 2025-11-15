@@ -88,22 +88,25 @@ create_audit_purpose() {
 
 # 건수 저장하는 변수랑 상세 항목 저장하는 배열 필요함 
 create_audit_result_summary() {
-    cat << EOF2 >> "$report" 
-    \begin{center}
-    \begin{tabular}{|p{1.5cm}|p{1cm}|p{2cm}|p{1.5cm}|p{8cm}|} 
-    \hline
-    \textbf{구분} & \textbf{등급} & \textbf{발견건수} & \textbf{비율} & \textbf{상세 항목} \\  \hline
-    점검결과 & 안전 & 25건 & 64.00\% & U\_01, U\_04, U\_05, U\_06, U\_07, U\_08, U\_11, U\_12, U\_14, U\_16, U\_18, U\_20, U\_22, U\_23, U\_24, U\_25, U\_26, U\_27, U\_28, U\_29, U\_30, U\_31, U\_33, U\_35, U\_37 \\  
-    \hline
-    & 경고 & 2건 & 5.00\% & U\_10, U\_17 \\
-    \hline
-    & 취약 & 12건 & 31.00\% & U\_00, U\_02, U\_03, U\_09, U\_13, U\_15, U\_19, U\_21, U\_32, U\_34, U\_36, U\_38 \\
-    \hline
-    \textbf{총계} & & 39건 & 100\% & - \\
-    \hline
-    \end{tabular}
-    \end{center}
+# cat << EOF2 대신 cat <<- EOF2 를 사용 (탭 무시)
+    cat <<- EOF2 >> "$report" 
+\begin{center}
+\begin{tabular}{|p{1.5cm}|p{1cm}|p{2cm}|p{1.5cm}|p{8cm}|} 
+\hline
+\textbf{구분} & \textbf{등급} & \textbf{발견건수} & \textbf{비율} & \textbf{상세 항목} \\ 
+\hline  # <-- \textbf{상세 항목} 뒤에 누락되었던 \\ 가 자동으로 들어간 후 \hline가 와야 합니다.
+점검결과 & 안전 & 25건 & 64.00\% & U\_01, U\_04, U\_05, U\_06, U\_07, U\_08, U\_11, U\_12, U\_14, U\_16, U\_18, U\_20, U\_22, U\_23, U\_24, U\_25, U\_26, U\_27, U\_28, U\_29, U\_30, U\_31, U\_33, U\_35, U\_37 \\ 
+\hline
+& 경고 & 2건 & 5.00\% & U\_10, U\_17 \\
+\hline
+& 취약 & 12건 & 31.00\% & U\_00, U\_02, U\_03, U\_09, U\_13, U\_15, U\_19, U\_21, U\_32, U\_34, U\_36, U\_38 \\
+\hline
+\textbf{총계} & & 39건 & 100\% & - \\
+\hline
+\end{tabular}
+\end{center}
 EOF2
+}
 
 
     # write_md "# 2. 점검 결과 요약"
@@ -116,7 +119,7 @@ EOF2
     # echo "| 총계 | - | 39건 | 100% | - |" >> $report
     # echo " " >>$report
 
-}
+
 
 create_audit_result_detail(){
     write_md "# 3. 상세 점검 결과"
