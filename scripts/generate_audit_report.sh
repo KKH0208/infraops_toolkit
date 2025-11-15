@@ -30,11 +30,15 @@ write_md(){
 
 
 create_header() {
+    echo "---" >>$report
     write_md "# 서버 보안 감사 보고서"
     write_md "**작성일:** $(date '+%y-%m-%d')"
     write_md "**점검 대상:** EC2 Apache 서버 (IP: 192.168.0.1)"
     write_md "**작성자:** ${USER}"
     write_md " "
+    echo "\newpage" >>$report
+    echo "---" >>$report
+
 }
 
 create_audit_purpose() {
