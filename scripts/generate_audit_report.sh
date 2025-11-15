@@ -86,6 +86,8 @@ create_audit_result_detail(){
         write_md "* 점검 결과"
         write_md "  + ${audit_result[$no]}"
         echo " --- " >> $report
+        echo " " >> $report
+        
 
     done < "$csv_file"
 
