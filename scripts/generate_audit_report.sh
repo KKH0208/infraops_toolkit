@@ -57,14 +57,15 @@ create_audit_result_summary() {
 
 
     write_md "## 2. 점검 결과 요약"
-    write_md ""
+    echo " " >>$report
     echo "| 구분 | 등급 | 발견건수 | 비율 | 상세 항목 |" >> $report
     echo "| ----- | ----- | ----- | ----- | ----- |" >> $report
     echo "| 점검결과 | 안전  | ${pass_cnt}건  | ${pass_ratio}%   | ${passed_items[*]} |" >> $report
     echo "|   | 경고  | ${na_cnt}건 | ${na_ratio}% | ${na_items[*]} |" >> $report
     echo "|   | 취약  | ${fail_cnt}건 | ${fail_ratio}% | ${failed_items[*]} |" >> $report
     echo "| 총계 | - | 39건 | 100% | - |" >> $report
-    write_md " "
+    echo " " >>$report
+
 }
 
 create_audit_result_detail(){
@@ -83,7 +84,6 @@ create_audit_result_detail(){
         write_md "* $fail"
         write_md "#### 점검 결과"
         write_md "* ${audit_result[$no]}"
-        write_md " "
         echo " --- " >> $report
 
     done < "$csv_file"
@@ -116,7 +116,8 @@ create_vuln_action_plan(){
                     write_md "* $desc"
                     write_md "#### 조치"
                     write_md "* $action"
-                    write_md " "
+                    echo " " >>$report
+
 
                 done 
                 ;;
@@ -129,7 +130,7 @@ create_vuln_action_plan(){
                 write_md "* $desc"
                 write_md "#### 조치"
                 write_md "* $action"
-                write_md " "
+                echo " " >>$report
 
                 if [[ "$item" == "U_13" || "$item" == "U_14" || "$item" == "U_21" || "$item" == "U_22" || "$item" == "U_23" || "$item" == "U_26" || "$item" == "U_27" || "$item" == "U_28" || "$item" == "U_35" ]]; then 
                     if [ "$item" == "U_13" ]; then 
@@ -169,7 +170,8 @@ create_vuln_action_plan(){
                     done 
                 fi
 
-                write_md " "
+                echo " " >>$report
+
                 ;;
         esac
 
