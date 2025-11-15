@@ -29,15 +29,33 @@ write_md(){
 }
 
 
+
+
+
+
 create_header() {
-    echo '---' >>$report
-    echo 'title: "서버 보안 감사 보고서"' >>$report
-    echo 'author: "**작성자:** ${USER}"' >>$report
-    echo 'subtitle: "점검 대상: EC2 Apache 서버 (IP: 192.168.0.1)"' >>$report
-    echo 'date: "**작성일:** $(date '+%y-%m-%d')"' >>$report
-    echo 'fontsize: 14pt ' >>$report
-    echo '---' >>$report
-    echo '\newpage' >>$report
+
+    cat << EOF > "$REPORT_FILE"
+---
+title: "서버 보안 감사 보고서"
+author: "**작성자:** ${USER}"
+subtitle: "점검 대상: EC2 Apache 서버 (IP: 192.168.0.1)"
+date: "**작성일:** $(date +%y-%m-%d)"
+fontsize: 14pt
+---
+
+\\newpage
+## 1. 개요<br>
+EOF
+}
+    # echo '---' >>$report
+    # echo 'title: "서버 보안 감사 보고서"' >>$report
+    # echo 'author: "**작성자:** ${USER}"' >>$report
+    # echo 'subtitle: "점검 대상: EC2 Apache 서버 (IP: 192.168.0.1)"' >>$report
+    # echo 'date: "**작성일:** $(date '+%y-%m-%d')"' >>$report
+    # echo 'fontsize: 14pt ' >>$report
+    # echo '---' >>$report
+    # echo '\newpage' >>$report
 
 
 
@@ -49,7 +67,7 @@ create_header() {
     # echo "\newpage" >>$report
     # echo "---" >>$report
 
-}
+
 
 
 
