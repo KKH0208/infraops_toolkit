@@ -45,7 +45,6 @@ fontsize: 14pt
 ---
 
 \\newpage
-## 1. 개요<br>
 EOF
 }
     # echo '---' >>$report
@@ -73,10 +72,10 @@ EOF
 
 
 create_audit_purpose() {
-    write_md "## 1. 개요"
+    write_md "# 1. 개요"
     write_md "본 보고서는 부서에서 관리하는 리눅스 서버에 대해 보안관리가 제대로 이루어지고 있는지 점검하는 것을 목적으로 한다."
     write_md " "
-    write_md "### 점검 범위"
+    write_md "## 점검 범위"
     write_md "* 사용자 계정 상태 관리"
     write_md "* 주요 파일 권한 및 소유자 점검 "
     write_md "* 위험 서비스 동작 유무 점검 "
@@ -92,7 +91,7 @@ create_audit_result_summary() {
 
 
 
-    write_md "## 2. 점검 결과 요약"
+    write_md "# 2. 점검 결과 요약"
     echo " " >>$report
     echo "| 구분 | 등급 | 발견건수 | 비율 | 상세 항목 |" >> $report
     echo "| ----- | ----- | ----- | ----- | ----- |" >> $report
@@ -105,11 +104,11 @@ create_audit_result_summary() {
 }
 
 create_audit_result_detail(){
-    write_md "## 3. 상세 점검 결과"
+    write_md "# 3. 상세 점검 결과"
     write_md "39가지 보안 점검 사항에 대해 평가기준(양호, 경고, 취약)을 정의하고, 이를 기반으로 수행된 최종 점검 결과를 표시한다"
     while IFS=',' read -r no title check_criteria pass fail na
     do 
-        write_md ">### U-$no $title"
+        write_md ">## U-$no $title"
         write_md "* 점검 기준"
         write_md "  + $check_criteria"
         write_md "* 양호"
@@ -130,7 +129,7 @@ create_audit_result_detail(){
 }
 
 create_vuln_action_plan(){
-    write_md "## 4. 취약 항목 요약 및 조치"
+    write_md "# 4. 취약 항목 요약 및 조치"
     write_md "다음은 점검 결과가 취약인 항목에 대한 현황 보고와 권장 조치 방안입니다."
 
     for idx in "${!failed_items[@]}";do
@@ -232,7 +231,7 @@ create_audit_result_detail
 create_vuln_action_plan
 
 cat $report
-
+pandoc $report -o report_${TIMESTAMP}.pdf --pdf-engine=xelatex -V mainfont="NanumGothic" -V boldfont="NanumGothic" -V geometry:margin=1in -V fontsize=12pt
 
 
 
