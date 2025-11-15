@@ -53,15 +53,17 @@ create_audit_purpose() {
 
 # 건수 저장하는 변수랑 상세 항목 저장하는 배열 필요함 
 create_audit_result_summary() {
+
+
+
     write_md "## 2. 점검 결과 요약"
     write_md ""
-    write_md "| 구분 | 등급 | 발견건수 | 비율 | 상세 항목 |"
-    write_md "| ----- | ----- | ----- | ----- | ----- |"
-    write_md "| 점검결과 | 안전  | ${pass_cnt}건  | ${pass_ratio}%   | ${passed_items[*]} |"
-    write_md "|   | 경고  | ${na_cnt}건 | ${na_ratio}% | ${na_items[*]} |"
-    write_md "|   | 취약  | ${fail_cnt}건 | ${fail_ratio}% | ${failed_items[*]} |"
-    write_md "| 총계 | - | 39건 | 100% | - |"
-
+    echo "| 구분 | 등급 | 발견건수 | 비율 | 상세 항목 |" >> $report
+    echo "| ----- | ----- | ----- | ----- | ----- |" >> $report
+    echo "| 점검결과 | 안전  | ${pass_cnt}건  | ${pass_ratio}%   | ${passed_items[*]} |" >> $report
+    echo "|   | 경고  | ${na_cnt}건 | ${na_ratio}% | ${na_items[*]} |" >> $report
+    echo "|   | 취약  | ${fail_cnt}건 | ${fail_ratio}% | ${failed_items[*]} |" >> $report
+    echo "| 총계 | - | 39건 | 100% | - |" >> $report
     write_md " "
 }
 
@@ -82,7 +84,7 @@ create_audit_result_detail(){
         write_md "#### 점검 결과"
         write_md "* ${audit_result[$no]}"
         write_md " "
-        write_md " --- "
+        echo " --- " >> $report
 
     done < "$csv_file"
 
