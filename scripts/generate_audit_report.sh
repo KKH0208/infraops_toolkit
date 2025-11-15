@@ -163,7 +163,7 @@ create_vuln_action_plan(){
 
 
                     for file in "${files_to_print[@]}"; do 
-                        write_md "`$file`"
+                        write_md "$file"
                     done 
                 fi
 
