@@ -16,8 +16,8 @@ TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 report="report_${TIMESTAMP}.md"
 report_pdf="report_${TIMESTAMP}.pdf"
 source ${SCRIPT_DIR}/security_audit.sh
-csv_file="${SCRIPT_DIR}../config/data_for_report.csv"
-json_file="${SCRIPT_DIR}../config/error_code_table.json"
+csv_file="${SCRIPT_DIR}/config/data_for_report.csv"
+json_file="${SCRIPT_DIR}/config/error_code_table.json"
 pass_ratio=$(echo "scale=2; ($pass_cnt / 39 ) * 100" | bc)
 na_ratio=$(echo "scale=2; ($na_cnt / 39 ) * 100" | bc)
 fail_ratio=$(echo "scale=2; 100 - $pass_ratio - $na_ratio" | bc)
