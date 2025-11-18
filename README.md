@@ -104,7 +104,7 @@
 
 
 ```
-
+scp root@192.168.151.79:/root/audit_files/scripts/test.pdf "C:\Users\KIM KIHYUN"
 
 이제 ./gene.. 프로그램 돌리면 바로 pdf 파일까지 만들어지게 함. 
 이걸 
@@ -124,3 +124,22 @@ pip install로 깔 수 있게 PyPI에 업로드가 더 좋겠지. 여기서 좀 
 
 
 
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+리눅스 서버에서 tmi프로그램을 다운 받았을때 같이 다운받아야 하는 패키지들 
+1. textual 
+python3 -m pip install --upgrade pip로 pip업데이트 하고 
+python3 -m pip install textual로 설치해야함 
+
+2.paramiko
+python3 -m pip install paramiko
+
+3. xelatex
+sudo dnf install texlive-xetex
+sudo dnf install texlive-ucharcat texlive-xetex
+
+
+
+***
+lastlog
+일단 pdf를 생성하는거까진 했는데 문제는 파일 이름에 이상한 글자가 들어가있어서 이걸 제거하는 수순이 필요할듯. 
+그리고 이걸 윈도우에서 보니까 취약항목같은 몇몇 변수들에 값이 안들어가있는 문제가 있는데 이거 왜 이런지 해결해야 할듯 

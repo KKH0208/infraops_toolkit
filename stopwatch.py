@@ -7,6 +7,8 @@ import paramiko
 import os
 local_script_path=["generate_audit_report.sh","security_audit.sh"]
 local_config_path=["data_for_report.csv","error_code_table.json"]
+local_namu_path=["NanumGothic-Bold.ttf","NanumGothic-ExtraBold.ttf","NanumGothic-Regular.ttf"]
+
 intro_text="""
 리눅스 서버를 자동으로 점검하고 결과 보고서를 생성합니다. 
 보고서는 PDF 또는 MD파일로 확인 가능합니다. 
@@ -125,10 +127,12 @@ class ProcessMainScreen(Screen):
             
     @work(thread=True, exclusive=True)    
     def run_audit_process(self):
-        remote_base_path=f"/home/{self.username}/audit_files"
+        remote_base_path=f"/{self.username}/audit_files"
         
         remote_path1=f"{remote_base_path}/scripts"
         remote_path2=f"{remote_base_path}/config"
+        remote_path3="/usr/share/fonts/truetype/nanum"
+        
 
         progressbar= self.query_one("#progressbar", ProgressBar)
         try:
@@ -143,6 +147,8 @@ class ProcessMainScreen(Screen):
             self.update_log(f"서버로 점검을 위한 프로그램 송신중...")
             ssh.exec_command(f"mkdir -p {remote_path1}")
             ssh.exec_command(f"mkdir -p {remote_path2}")
+            ssh.exec_command(f"mkdir -p {remote_path3}")
+            
             sftp=ssh.open_sftp()
             
             for i,filename in enumerate(local_script_path):
@@ -161,6 +167,13 @@ class ProcessMainScreen(Screen):
                 self.update_log(f"전송완료 - {filename}")
                 # self.call_later(progressbar.advance(10+i*5))
                 self.call_later(progressbar.update, total=100, progress=20+i*5)
+            for i,filename in enumerate(local_namu_path):
+                remote_file=f"{remote_path3}/{filename}"
+                filename=f"./Nanum_Gothic/{filename}"
+                sftp.put(filename,remote_file)
+                self.update_log(f"전송완료 - {filename}")
+
+
             
             self.update_log("프로그램 실행 권한 수정중...")
             ssh.exec_command(f"chmod u+x {remote_path1}/generate_audit_report.sh")

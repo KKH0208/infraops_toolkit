@@ -14,6 +14,7 @@
 SCRIPT_DIR=$(cd "$(dirname $0)" && pwd )
 TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 report="report_${TIMESTAMP}.md"
+report_pdf="report_${TIMESTAMP}.pdf"
 source ./security_audit.sh
 csv_file="../config/data_for_report.csv"
 json_file="../config/error_code_table.json"
@@ -251,7 +252,7 @@ create_audit_result_detail
 create_vuln_action_plan
 
 cat $report
-pandoc $report -o report_${TIMESTAMP}.pdf --pdf-engine=xelatex -V mainfont="NanumGothic" -V boldfont="NanumGothic" -V geometry:margin=1in -V fontsize=12pt
+/usr/local/bin/pandoc ${report} -o ${report_pdf} --pdf-engine=xelatex -V mainfont="NanumGothic" -V boldfont="NanumGothic" -V geometry:margin=1in -V fontsize=12pt
 
 
 
