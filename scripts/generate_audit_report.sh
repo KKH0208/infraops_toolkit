@@ -96,11 +96,11 @@ create_audit_result_summary() {
     ESCAPED_NA_ITEMS=$(escape_for_latex "${na_items[*]}")
     ESCAPED_FAILED_ITEMS=$(escape_for_latex "${failed_items[*]}")
 
-    # write_md 함수가 "# 2. 점검 결과 요약"을 파일에 쓰는 역할이라고 가정합니다.
+
     write_md "# 2. 점검 결과 요약" 
-    echo " " >>$report # 빈 줄 추가
+    echo " " >>$report 
     
-    # 2. 이스케이프된 변수를 표에 사용
+
     cat <<- EOF2 >> "$report" 
 \begin{center}
 \begin{tabular}{|p{1.5cm}|p{1cm}|p{2cm}|p{1.5cm}|p{8cm}|} 
@@ -120,16 +120,6 @@ create_audit_result_summary() {
 EOF2
 }
 
-
-    # write_md "# 2. 점검 결과 요약"
-    # echo " " >>$report
-    # echo "| 구분 | 등급 | 발견건수 | 비율 | 상세 항목 |" >> $report
-    # echo "| ----- | ----- | ----- | ----- | ----- |" >> $report
-    # echo "| 점검결과 | 안전  | ${pass_cnt}건  | ${pass_ratio}%   | ${passed_items[*]} |" >> $report
-    # echo "|   | 경고  | ${na_cnt}건 | ${na_ratio}% | ${na_items[*]} |" >> $report
-    # echo "|   | 취약  | ${fail_cnt}건 | ${fail_ratio}% | ${failed_items[*]} |" >> $report
-    # echo "| 총계 | - | 39건 | 100% | - |" >> $report
-    # echo " " >>$report
 
 
 

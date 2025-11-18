@@ -3,7 +3,6 @@
 #========== 설정 ============
 
 SCRIPT_DIR=$(cd "$(dirname $0)/../" && pwd )
-CONFIG_FILE="$SCRIPT_DIR"/config/slack.conf
 TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 LOG_FILE=$SCRIPT_DIR/reports/audit_$TIMESTAMP.log
 
