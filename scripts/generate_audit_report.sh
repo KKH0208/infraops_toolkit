@@ -15,7 +15,7 @@ SCRIPT_DIR=$(cd "$(dirname $0)" && pwd )
 TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 report="report_${TIMESTAMP}.md"
 report_pdf="report_${TIMESTAMP}.pdf"
-source ./security_audit.sh
+source ${SCRIPT_DIR}/security_audit.sh
 csv_file="../config/data_for_report.csv"
 json_file="../config/error_code_table.json"
 pass_ratio=$(echo "scale=2; ($pass_cnt / 39 ) * 100" | bc)
