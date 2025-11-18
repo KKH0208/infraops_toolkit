@@ -32,14 +32,14 @@ na_items=()
 
 #========== 함수 ============
 
-load_config(){
-    if [ -f "$CONFIG_FILE" ]; then 
-        source "$CONFIG_FILE"
-    else
-        echo "[ERROR] config file not found : "$CONFIG_FILE" "
-        exit 1 
-    fi 
-}
+# load_config(){
+#     if [ -f "$CONFIG_FILE" ]; then 
+#         source "$CONFIG_FILE"
+#     else
+#         echo "[ERROR] config file not found : "$CONFIG_FILE" "
+#         exit 1 
+#     fi 
+# }
 
 log(){
     local level=$1
@@ -1582,7 +1582,7 @@ U_38(){
 
 #이거도 반복문으로 돌려도 될듯? 
 
-load_config
+# load_config
 
 for num in {0..38}; do 
 
