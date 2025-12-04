@@ -254,7 +254,8 @@ create_vuln_action_plan
 cat $report
 pandoc_path=$(which pandoc)
 ${pandoc_path} ${report} -o ${report_pdf} --pdf-engine=xelatex -V mainfont="NanumGothic" -V boldfont="NanumGothic" -V geometry:margin=1in -V fontsize=12pt
-
+echo "$report"
+echo "$report_pdf"
 
 
 # 지금 해결해야 하는것 

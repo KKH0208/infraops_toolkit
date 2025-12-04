@@ -4,7 +4,7 @@
 
 SCRIPT_DIR=$(cd "$(dirname $0)/../" && pwd )
 TIMESTAMP=$(date "+%y%m%d_%H%M%S")
-LOG_FILE=$SCRIPT_DIR/reports/audit_$TIMESTAMP.log
+LOG_FILE=$SCRIPT_DIR/../audit_$TIMESTAMP.log
 
 pass_cnt=0
 fail_cnt=0
@@ -47,7 +47,7 @@ log(){
     LOG_TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 
     echo "$mesg" 
-    echo "[$LOG_TIMESTAMP][$level] $mesg" >> $LOG_FILE 
+        echo "[$LOG_TIMESTAMP][$level] $mesg" >> $LOG_FILE 
 }
 
 
