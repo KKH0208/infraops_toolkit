@@ -24,40 +24,40 @@
 1. 프로그램이 시작되면 서버 점검을 실시할 서버에 접속할 방법을 선택합니다. 계정의 
 비밀번호를 이용하여 접속하는 방법과 ssh키 파일을 선택하여 접속하는 방법이 있습니다. 
 <br><br>
-![alt text](images/image.png)
+![alt text](./images/image.png)
 <br><br>
 2. 비밀번호로 접속하기를 선택하면 서버의 ip주소와 계정명,계정 비밀번호를 입력하고 접속을 선택합니다. 
 <br><br>
-![alt text](images/image-1.png) 
+![alt text](./images/image-1.png) 
 <br><br>
 ssh키로 접속하기를 선택하면 서버의 ip주소와 계정명,ssh키 파일의 위치를 선택한 후 접속을 선택합니다. 
 <br><br>
-![alt text](images/image-2.png)
+![alt text](./images/image-2.png)
 <br><br>
 선택 버튼을 누르면 파일 탐색기가 표시됩니다. 서버 접속을 위한 ssh키를 선택하고 open을 선택합니다. 
 <br><br>
-![alt text](images/image-3.png)
+![alt text](./images/image-3.png)
 <br><br>
 3. 입력한 점검 대상 서버의 주소를 이용해 ssh접속을 시도합니다. 이후 서버 점검 및 보고서 작성이 시작됩니다. 점검 및 보고서 작성이 끝나면 사용자의 홈 디렉터리에 report_{time}.pdf,report_{time}.md 형식의 파일이 다운로드 됩니다. 
 <br><br>
-![alt text](images/image-4.png)
+![alt text](./images/image-4.png)
 <br><br>
 
 ## 보고서 예시 
 본 프로그램의 출력물인 보고서의 예시입니다. <br>
 1.개요 - 보고서에 대한 간단한 설명입니다.
 <br><br>
-![alt text](images/image-5.png)
+![alt text](./images/image-5.png)
 <br><br>
 2.점검 결과 요약 - 39가지 점검 사항에 대해 `양호`, `취약`, `경고` 의 개수와 어떤 항목이 포함되어 있는지 나타냅니다. 
 <br><br>
-![alt text](images/image-6.png)
+![alt text](./images/image-6.png)
 <br><br>
 3.상세 점검 결과 - 39가지 점검 사항에 대해 `점검 기준`, `양호 기준`, `취약 기준`, `경고 기준`을 제시하고 점검 결과를 표시합니다. 
 <br><br>
-![alt text](images/image-7.png)
+![alt text](./images/image-7.png)
 <br><br>
 4.취약항목 요약 및 조치 - 점검 결과가 `취약`인 항목들에 대해 취약으로 분류된 이유와 조치 방법을 제시합니다.
 <br><br>
-![alt text](images/image-8.png)
+![alt text](./images/image-8.png)
 <br><br>
