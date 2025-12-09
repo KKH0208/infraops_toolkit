@@ -361,7 +361,6 @@ class Security_audit_program(App):
         "intro":IntroScreen,
         "password_main":PasswordMainScreen,
         "ssh_main":SshMainScreen
-        # "process_main":ProcessMainScreen 얘는 인자를 받아야 해서 이런식으로 하면 인자를 못줌
                }
     
     def on_mount(self) -> None:

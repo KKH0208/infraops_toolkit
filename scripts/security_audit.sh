@@ -12,64 +12,33 @@ na_cnt=0
 
 error_code=0 # 에러코드가 한가지 경우의 수만 존재할 경우 
 error_code_array=(0 0 0 0 0 0 0 0 0 0 0 0) # 에러 코드가 복수가 가능할 경우 
-declare -A warning_files # 얘도 키가 U_01이면 값이 (1 2 3) 이런식으로
+declare -A warning_files 
 audit_result=()
-error_code_list=()      # 얘가 일반경우일때의 에러코드를 보관하는 애들, 어차피 에러코드는 하나일테니 
-declare -A error_code_dict  #얘가 복잡할 경우. 키가 U_01이면 값이 (1 2 3) 이런식으로 경우에 대해 출력해야하는 모든 에러코드가 존재
+error_code_list=()      #일반경우일때의 에러코드를 보관하는 리스트
+declare -A error_code_dict  #복잡할 경우. 키가 U_01이면 값이 (1 2 3) 이런식으로 경우에 대해 출력해야하는 모든 에러코드가 존재
 
 
 
 
-#따로 분기 필요한 애들 : 2,10,13,14,22 23 24 27 28 29 38   이 놈들은 error_code_list값 순회하고 1이면 Json에서 가져와서 반복해서 출력해야할듯 
-#잘 모르겠는 애들 : 16 17 30 33 
-#근데 16은 일단 돌리긴 가능 17 30 33은 없애고 하나씩 번호 밀자
 
 
-#불필요한~~ 이런거 무슨 서비스를 꺼야 하는지도 나오게 해야할듯 
+
 passed_items=()
 failed_items=()
 na_items=()
 
 #========== 함수 ============
 
-# load_config(){
-#     if [ -f "$CONFIG_FILE" ]; then 
-#         source "$CONFIG_FILE"
-#     else
-#         echo "[ERROR] config file not found : "$CONFIG_FILE" "
-#         exit 1 
-#     fi 
-# }
-
 log(){
     local level=$1
     local mesg=$2
     LOG_TIMESTAMP=$(date "+%y%m%d_%H%M%S")
 
-    echo "$mesg" 
-        echo "[$LOG_TIMESTAMP][$level] $mesg" >> $LOG_FILE 
+    #echo "$mesg" 
+    echo "[$LOG_TIMESTAMP][$level] $mesg" >> $LOG_FILE 
 }
 
 
-send_alert(){
-    MSG=$1
-    if [ -z $WEBHOOK_URL ]; then 
-        log "[WARN]" "WEBHOOK_URL 환경변수를 설정해주세요"
-        return 1
-    fi
-
-    curl -s -X POST --data-urlencode "payload={\"channel\": \"$CHANNEL_NAME\", \"username\": \"$USERNAME\", \"text\": \"$MSG\", \"icon_emoji\": \":ghost:\"}" $WEBHOOK_URL >/dev/null
-    if [ $? -ne 0 ]; then 
-        log "[ERROR]" "slack 알람 전송에 실패했습니다"
-        return 1
-    fi
-}
-
-audit_server(){
-    ssh_warn=0
-    log "INFO" "서버 보안 점검을 시작합니다"
-
-}
 
 check_password_quality(){
     local key=$1 
@@ -141,7 +110,6 @@ U_00(){
 
 
 
-# 이러면 두개 다 문제 있으면 하나만 조치가 뜨긴 하네 둘 다 뜨게 고치긴 해야할듯 
 U_01(){
     
     echo "========== ssh 설정 확인 ============"
@@ -185,9 +153,6 @@ U_01(){
 
 
 
-
-# 얘는 에러코드가 배열이니까 처리가 어렵긴 하구만
-# 에러코드테이블보고 인덱스 0이 1이면 안전, 인덱스 10이 1이면 경고, 나머지는 뭔가 문제가 있는거니까 순회하면서 에러내용출력
 U_02(){
     echo "========== 패스워드 복잡성 설정 ============"
     local lcredit=1 #소문자 최소 1자 이상 요구
@@ -472,7 +437,7 @@ U_09(){
     fi   
 }
 
-#일단은 inetd는 옛날이니까 xinetd만 확인하자 
+
 U_10(){
     # “/etc/xinetd.conf” 파일 및 “/etc/xinetd.d/” 하위 모든 파일의 소유자 및 권한 확인
     #ls –l /etc/xinetd.conf
@@ -751,7 +716,7 @@ U_14(){
     fi 
 
     
-    #이거 그냥 /root랑 /home/돌면서 확인하는게 빠를듯. 일단 /home안에 있는 이름들 다 배열에 저장하고 들어가서 확인하는 식으로 
+   
 
 }
 
@@ -1212,20 +1177,6 @@ U_28(){
 
 }
 
-# 아아 이건 좀 빡세긴 하네 최신버전을 가져오는게 힘들다. 애초에 어디까지를 기준으로 잡을지도 애매하기도 하고 흠.. 패스? 
-# U_30(){
-#     echo "========== Sendmail 버전 점검 ============"
-
-#     if [ $(systemctl is-active sendmail.service ) = "active" ]; then 
-#         version=$(rpm -q sendmail)
-#         if 
-
-
-#     else
-#         log "NOTICE" "Sendmail이 inactive상태입니다."
-#         log "NOTICE" "U_30테스트 점검불가"        
-#     fi  
-# }
 
 U_29(){
     echo "========== 스팸 메일 릴레이 제한 ============"
@@ -1578,18 +1529,21 @@ U_38(){
     fi 
 
 }
+
+
+
+
+
+
+
 #========== 메인 ============
-
-#이거도 반복문으로 돌려도 될듯? 
-
-# load_config
 
 for num in {0..38}; do 
 
     func_name="U_$(printf '%02d' "$num")"
     error_code=0
 
-    # 밑에 초기화 전에 워닝파일을 활용해야 하는디..
+
     case $num in 
         2|10|35|38)
             for j in "${!error_code_array[@]}"; do
@@ -1597,10 +1551,6 @@ for num in {0..38}; do
             done
             ;;
 
-        #이건 테스트때만 잠깐 해놓자 
-        # 6)
-        #     continue
-        #     ;;
 
         *)
             ;;
@@ -1617,14 +1567,10 @@ for num in {0..38}; do
             audit_result+=("취약")
         fi 
 
-        #에러코드 모아놔서 레포트 4에 쓰기 위해
-        # error_code_array를 순회하면서 1이면 그때의 인덱스를 error_code_dict에 저장하는거지
 
-        #우리가 결국 보고서 4에 출력할 놈들은 에러코드가 1~9 사이인 놈이니까 
         if [ $error_code -ne 0 ]; then 
             if [ $error_code -lt 10 ]; then 
                 error_code_list+=("$error_code")
-                echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!에러코드리스트 추가 qjsgh $num"
             case $num in
                 2|10|35|38)
                     error_codes=()
@@ -1641,152 +1587,5 @@ for num in {0..38}; do
         fi 
     fi 
 done 
-
-
-
-# # =========================================================
-# # ⭐⭐⭐ 디버깅: 취약점 기록 변수 최종 확인 ⭐⭐⭐
-# # 이 코드는 모든 점검 함수 실행 후 변수 상태를 확인합니다.
-# # =========================================================
-
-# echo ""
-# echo "========================================================"
-# echo "🚨 취약점 기록 변수 최종 상태 (디버깅 정보)"
-# echo "========================================================"
-
-# # 1. warning_files (특정 파일/서비스 목록) 확인
-# echo "### 1. warning_files (특수 항목에서 취약한 파일/서비스 목록) ###"
-# if [ ${#warning_files[@]} -eq 0 ]; then
-#     echo "> 비어 있음"
-# else
-#     for key in "${!warning_files[@]}"; do
-#         # 'U_xx' 항목별로 저장된 목록 출력
-#         echo "> $key 항목: [${warning_files[$key]}]"
-#     done
-# fi
-
-# echo "--------------------------------------------------------"
-
-# # 2. error_code_list (일반 항목의 단일 에러코드 목록) 확인
-# echo "### 2. error_code_list (일반 항목의 단일 에러코드 목록) ###"
-# if [ ${#error_code_list[@]} -eq 0 ]; then
-#     echo "> 비어 있음"
-# else
-#     # 배열 내용을 공백으로 구분하여 출력
-#     echo "> [${error_code_list[*]}]" 
-# fi
-
-# echo "--------------------------------------------------------"
-
-# # 3. error_code_dict (특수 항목의 복수 에러코드 맵) 확인
-# echo "### 3. error_code_dict (특수 항목의 복수 에러코드 맵) ###"
-# if [ ${#error_code_dict[@]} -eq 0 ]; then
-#     echo "> 비어 있음"
-# else
-#     for key in "${!error_code_dict[@]}"; do
-#         # 'U_xx' 항목별로 저장된 에러코드 목록(공백 구분된 문자열) 출력
-#         echo "> $key 항목: [${error_code_dict[$key]}]"
-#     done
-# fi
-
-# echo "========================================================"
-# echo ""
-
-# # =========================================================
-# # ⭐⭐⭐ 디버깅 코드 끝 ⭐⭐⭐
-# # =========================================================
-
-
-
-
-
-
-# U_00
-# U_01
-# U_02
-# U_03
-# U_04
-# U_05
-# #U_06 오래 걸려서 일단 주석처리
-# U_07
-# U_08
-# U_09
-# U_10
-# U_11
-# U_12
-# U_13
-# U_14 
-# U_15
-# U_16
-# # U_17 뭔지 모르겠다 나중에 확인하자 
-# U_18
-# U_19
-# U_20
-# U_21
-# U_22
-# U_23
-# U_24
-# U_25
-# U_26
-# U_27
-# U_28
-# U_29
-# #U_30 최신버전 확인이 빡센데
-# U_31
-# U_32
-# #U_33 이거도 최신버전 
-# U_34
-# U_35
-# U_36 
-# U_37 
-# U_38 
-# U_39
-# U_40
-# U_41
-
-
-
-
-
-
-
-
-
-
-
-
-#==========공부노트 ============
-# /etc/pam.d/login에 보면 무슨 모듈을 쓸지 나오는데 밑에 모듈이 있어야 하고 
-# auth required /lib/security/pam_securetty.so
-# 이 모듈은 etc/securetty를 참조해서 루트가 무슨 터미널로 로그인 가능할지 정의한다. 
-# tty는 물리터미널이고 pts는 가상터미널(ssh같은)이기 때문에 루트는 무조건 물리터미널에서만 로그인 가능하게 설정해야 한다. 
-
-#find /etc -type f -perm /0133 | wc -l 
-#여기서 -perm /0133 이거는 --x-wx-wx 이 5개중 하나라도 들어있으면 1이고 하나도 안들어있으면 0
-# xx-x-----
-# --x-xxxxx 1 3 7 
-
-
-
-
-# 값 (숫자)	심각도(Level)	설명	예시 로그
-# 0	emerg	시스템이 사용 불가 상태 (치명적)	커널 패닉
-# 1	alert	즉시 조치가 필요한 상태	디스크 장애
-# 2	crit	치명적인 오류	파일시스템 오류
-# 3	err (error)	일반 오류	애플리케이션 실패
-# 4	warn (warning)	경고, 잠재적 문제	설정 경고
-# 5	notice	중요하지만 에러는 아님	서비스 시작 알림
-# 6	info	정보성 메시지	로그인 로그
-# 7	debug	디버깅용 상세 메시지	개발 중 디버깅
-
-# warn, notice, info  3개로 나누는게 좋을듯 U23부터 할게
-# 취약, 안전 말고 점검불가도 쓰자. 
-
-
-
-#systemctl list-units --type=service --all | grep -Eq  "ypserv|ypbind|ypxfrd|rpc.yppasswdd|rpc.ypupdated
-# -> 이건 저 서비스들이 깔려 있으면 출력됨
-# systemctl is-active ypserv 이러면 활성화 여부 확인가능 active 뜨면 실행중. 
-
 
 

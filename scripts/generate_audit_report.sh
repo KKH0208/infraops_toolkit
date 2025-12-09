@@ -1,12 +1,3 @@
-
-
-
-#2,10,13,14,22 23 24 27 28 29 38 이 놈들은 error_code_list값 순회하고 1이면 Json에서 가져와서 반복해서 출력해야할듯 case로 저 번호일땐 순회해서 1이면 출력 이런 느낌으로 create_vuln_action_plan 고치자 
-
-
-#아니 2 10 35가 에러코드 여러개일 수 있는놈이고 13 14 21 22 26 27 28 35가 파일혹은 서비스 종류를 제시해야 하는 놈인데 지금 문제가 35때문이네
-
-
 #/bin/bash 
 
 #========== 설정 ============
@@ -31,9 +22,6 @@ write_md(){
 
 
 
-
-
-
 create_header() {
 
     cat << EOF > "$report"
@@ -48,27 +36,7 @@ fontsize: 14pt
 \\newpage
 EOF
 }
-    # echo '---' >>$report
-    # echo 'title: "서버 보안 감사 보고서"' >>$report
-    # echo 'author: "**작성자:** ${USER}"' >>$report
-    # echo 'subtitle: "점검 대상: EC2 Apache 서버 (IP: 192.168.0.1)"' >>$report
-    # echo 'date: "**작성일:** $(date '+%y-%m-%d')"' >>$report
-    # echo 'fontsize: 14pt ' >>$report
-    # echo '---' >>$report
-    # echo '\newpage' >>$report
-
-
-
-    # write_md "# 서버 보안 감사 보고서"
-    # write_md "**작성일:** $(date '+%y-%m-%d')"
-    # write_md "**점검 대상:** EC2 Apache 서버 (IP: 192.168.0.1)"
-    # write_md "**작성자:** ${USER}"
-    # write_md " "
-    # echo "\newpage" >>$report
-    # echo "---" >>$report
-
-
-
+>>$report
 
 
 
@@ -258,6 +226,3 @@ echo "$report"
 echo "$report_pdf"
 
 
-# 지금 해결해야 하는것 
-# 1. 경고항목은 4출력 하는데 취약항목은 출력 안하는듯 
-# 2. 취약 항목도 출력이 이상함. 일반이상은 괜찮은데 특수경우가 출력 이상한듯 
