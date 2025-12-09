@@ -7,6 +7,7 @@ from textual_fspicker import FileOpen
 import paramiko
 import os
 from typing import Optional
+from importlib.resources import files
 local_script_path=["generate_audit_report.sh","security_audit.sh"]
 local_config_path=["data_for_report.csv","error_code_table.json"]
 local_namu_path=["NanumGothic-Bold.ttf","NanumGothic-ExtraBold.ttf","NanumGothic-Regular.ttf"]
@@ -274,37 +275,35 @@ class ProcessMainScreen(Screen):
             
   
             sftp=ssh.open_sftp()
-            
-            for i,filename in enumerate(local_script_path):
-                remote_file=f"{remote_path1}/{filename}"
-                filename=f"./scripts/{filename}"
-                sftp.put(filename,remote_file)
-                self.update_log(f"전송완료 - {filename}")
+            package_root = files("security_audit_app")
+            for i, filename in enumerate(local_script_path):
+                local_path = package_root.joinpath("scripts", filename)
+                local_path = str(local_path)
+                remote_file = f"{remote_path1}/{filename}"
+                sftp.put(local_path, remote_file)
+                self.update_log(f"전송완료 - {local_path}")
                 # self.call_later(progressbar.advance(10+i*5))
                 self.call_later(progressbar.update, total=100, progress=10+i*10)
                 
-            for i,filename in enumerate(local_config_path):
-                remote_file=f"{remote_path2}/{filename}"
-                filename=f"./config/{filename}"
-                
-                sftp.put(filename,remote_file)
-                self.update_log(f"전송완료 - {filename}")
-                # self.call_later(progressbar.advance(10+i*5))
+            for i, filename in enumerate(local_config_path):
+                local_path = package_root.joinpath("config", filename)
+                local_path = str(local_path)
+                remote_file = f"{remote_path2}/{filename}"
+                sftp.put(local_path, remote_file)
+                self.update_log(f"전송완료 - {local_path}")
                 self.call_later(progressbar.update, total=100, progress=30+i*10)
-            if self.username == "root":
-                for i,filename in enumerate(local_namu_path):
-                    remote_file=f"{remote_path3}/{filename}"
-                    filename=f"./Nanum_Gothic/{filename}"
-                    sftp.put(filename,remote_file)
-                    self.update_log(f"전송완료 - {filename}")
-            else:
-                for i,filename in enumerate(local_namu_path):
-                    remote_file=f"{remote_path4}/{filename}"
-                    filename=f"./Nanum_Gothic/{filename}"
-                    sftp.put(filename,remote_file)
-                    self.update_log(f"전송완료 - {filename}")
-                ssh.exec_command(f"sudo mv {remote_path4}/* {remote_path3}")
-            self.call_later(progressbar.update, total=100, progress=60)
+            for i, filename in enumerate(local_namu_path):
+                local_path = package_root.joinpath("Nanum_Gothic", filename)
+                local_path = str(local_path)
+
+                if self.username == "root":
+                    remote_file = f"{remote_path3}/{filename}"
+                else:
+                    remote_file = f"{remote_path4}/{filename}"
+
+                sftp.put(local_path, remote_file)
+                self.update_log(f"전송완료 - {local_path}")
+                self.call_later(progressbar.update, total=100, progress=60)
             
             self.update_log("프로그램 실행 권한 수정중...")
             ssh.exec_command(f"chmod u+x {remote_path1}/generate_audit_report.sh")
