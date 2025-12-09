@@ -9,7 +9,7 @@
 
 ## 설치 및 실행방법 
 1. 터미널에서 pip을 사용하여 프로그램을 설치합니다. <br>
-`pip install security-audit-app`
+`pip install security-audit`
 2. 설치가 완료되면 터미널에서 `saudit` 명령어로 프로그램을 실행할 수 있습니다. 
 
 ## 개발 환경 및 의존성
