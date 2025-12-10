@@ -1,4 +1,4 @@
-# sedurity audit program 
+# security audit program 
 ## 프로젝트 소개 
 본 프로젝트에서는 리눅스 서버의 보안 상태를 자동으로 점검해주고 점검결과를 보고서로 작성해주는 TUI프로그램을 작성합니다. 
 
